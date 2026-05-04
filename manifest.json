@@ -1,0 +1,24 @@
+{
+  "name": "每日打卡",
+  "short_name": "打卡",
+  "description": "每日松解拉伸 · 体态纠正 · 打卡追踪",
+  "start_url": "/daily-tracker/",
+  "display": "standalone",
+  "background_color": "#F5F0EB",
+  "theme_color": "#C4836A",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
