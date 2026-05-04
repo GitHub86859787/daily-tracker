@@ -12,542 +12,188 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #F5F0EB;
-  --card: #FFFFFF;
-  --text: #2C2C2C;
-  --dim: #8A8480;
-  --accent: #C4836A;
-  --accent-dark: #9B5E47;
-  --accent-light: #F0DDD4;
-  --border: #E4DDD6;
-  --green: #5BA05B;
-  --green-light: #E8F5E8;
-  --green-bg: rgba(91,160,91,0.08);
-  --red-light: #FDECEC;
-  --blue: #5B8EC4;
-  --yellow: #E8C84A;
-  --shadow: rgba(0,0,0,0.04);
-  --timer-active: #D4663A;
-  --timer-bg: #FFF5F0;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: 'Noto Sans SC', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.7;
-  font-size: 15px;
-  min-height: 100vh;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.top-bar {
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  padding: 18px 20px 14px;
-  padding-top: calc(18px + env(safe-area-inset-top));
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.top-bar h1 { font-size: 20px; font-weight: 900; color: var(--accent-dark); }
-.top-bar .date-display { font-size: 13px; color: var(--dim); }
-
-.view-toggle {
-  display: flex; gap: 0; margin: 16px 20px 0;
-  background: var(--card); border-radius: 10px;
-  border: 1px solid var(--border); overflow: hidden;
-}
-.view-btn {
-  flex: 1; padding: 10px; text-align: center;
-  font-size: 14px; font-weight: 700; color: var(--dim);
-  cursor: pointer; transition: all 0.2s; border: none; background: none;
-}
-.view-btn.active { background: var(--accent); color: white; }
-
-.container { max-width: 800px; margin: 0 auto; padding: 0 20px 100px; }
-.today-view { display: block; }
-.calendar-view { display: none; }
-
-.progress-section { display: flex; align-items: center; gap: 20px; padding: 20px 0; }
-.ring-wrap { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
-.ring-wrap svg { transform: rotate(-90deg); }
-.ring-bg { fill: none; stroke: var(--border); stroke-width: 6; }
-.ring-fill { fill: none; stroke: var(--green); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
-.ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 20px; font-weight: 900; color: var(--green); }
-.progress-info { flex: 1; }
-.progress-info .done-count { font-size: 14px; color: var(--dim); }
-.progress-info .streak { font-size: 13px; color: var(--accent); font-weight: 700; margin-top: 4px; }
-
-.category { margin-top: 16px; }
-.cat-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; cursor: pointer; }
-.cat-left { display: flex; align-items: center; gap: 10px; }
-.cat-dot { width: 10px; height: 10px; border-radius: 50%; }
-.cat-name { font-size: 15px; font-weight: 700; }
-.cat-progress { font-size: 12px; color: var(--dim); background: var(--green-light); padding: 2px 8px; border-radius: 10px; }
-.cat-items { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 6px; }
-
-.check-row {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 14px 16px; border-bottom: 1px solid #F0EBE6; transition: background 0.15s;
-}
-.check-row:last-child { border-bottom: none; }
-.check-row.done { opacity: 0.45; }
-
-.checkbox {
-  flex-shrink: 0; width: 24px; height: 24px; border-radius: 7px;
-  border: 2px solid var(--border); display: flex; align-items: center;
-  justify-content: center; margin-top: 1px; transition: all 0.2s; cursor: pointer;
-}
-.check-row.done .checkbox { background: var(--green); border-color: var(--green); }
-.checkbox::after { content: ''; display: none; }
-.check-row.done .checkbox::after { content: '✓'; display: block; color: white; font-size: 14px; font-weight: 700; }
-
-.check-info { flex: 1; cursor: pointer; }
-.check-title { font-size: 14.5px; font-weight: 500; line-height: 1.5; }
-.check-row.done .check-title { text-decoration: line-through; }
-.check-detail { font-size: 12.5px; color: var(--dim); margin-top: 2px; line-height: 1.5; }
-
-.check-right { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-top: 2px; }
-.check-time { font-size: 12px; color: var(--accent); font-weight: 700; background: var(--accent-light); padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
-
-.timer-btn {
-  display: flex; align-items: center; gap: 4px; padding: 4px 10px;
-  border-radius: 8px; border: 1.5px solid var(--border); background: var(--card);
-  font-size: 12px; font-weight: 700; color: var(--dim); cursor: pointer;
-  transition: all 0.2s; white-space: nowrap; font-family: 'Noto Sans SC', sans-serif;
-}
-.timer-btn:active { transform: scale(0.95); }
-.timer-btn .timer-icon { font-size: 13px; line-height: 1; }
-.timer-btn.running {
-  background: var(--timer-bg); border-color: var(--timer-active);
-  color: var(--timer-active); animation: timer-pulse 1.5s ease-in-out infinite;
-}
-.timer-btn.finished { background: var(--green-light); border-color: var(--green); color: var(--green); animation: none; }
-@keyframes timer-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(212,102,58,0.15); }
-  50% { box-shadow: 0 0 0 6px rgba(212,102,58,0.08); }
-}
-
-.floating-timer {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  background: var(--text); color: white; padding: 12px 24px; border-radius: 16px;
-  font-size: 15px; font-weight: 700; display: none; align-items: center; gap: 12px;
-  z-index: 200; box-shadow: 0 8px 32px rgba(0,0,0,0.2); cursor: pointer;
-  max-width: calc(100% - 40px);
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
-}
-.floating-timer.show { display: flex; }
-.floating-timer .ft-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; opacity: 0.8; }
-.floating-timer .ft-time { font-size: 20px; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
-.floating-timer .ft-stop {
-  background: rgba(255,255,255,0.2); border: none; color: white;
-  width: 28px; height: 28px; border-radius: 50%; font-size: 14px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-
-.month-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 0 12px; }
-.month-title { font-size: 18px; font-weight: 900; color: var(--accent-dark); }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 20px; }
-.cal-weekday { text-align: center; font-size: 12px; font-weight: 700; color: var(--dim); padding: 4px 0; }
-.cal-day {
-  aspect-ratio: 1; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; border-radius: 10px; font-size: 14px; font-weight: 500;
-  background: var(--card); border: 1px solid var(--border); position: relative; cursor: pointer;
-}
-.cal-day.empty { background: transparent; border: none; }
-.cal-day.today { border-color: var(--accent); border-width: 2px; }
-.cal-day.future { opacity: 0.3; }
-.cal-day .day-num { font-size: 14px; }
-.cal-day .day-pct { font-size: 9px; font-weight: 700; margin-top: 1px; }
-.cal-day.complete { background: var(--green); border-color: var(--green); color: white; }
-.cal-day.complete .day-pct { color: rgba(255,255,255,0.8); }
-.cal-day.partial { background: var(--green-light); border-color: #C8E6C8; }
-.cal-day.missed { background: var(--red-light); border-color: #E8C8C8; }
-
-.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
-.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
-.stat-num { font-size: 24px; font-weight: 900; color: var(--accent-dark); }
-.stat-label { font-size: 11px; color: var(--dim); margin-top: 2px; }
-
-.reset-bar { display: flex; gap: 8px; padding: 16px 0; }
-.reset-btn {
-  flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--card); color: var(--dim); font-size: 13px; cursor: pointer;
-  text-align: center; font-weight: 500;
-}
-.reset-btn:active { background: #F0EBE6; }
+:root{--bg:#F5F0EB;--card:#FFF;--text:#2C2C2C;--dim:#8A8480;--accent:#C4836A;--accent-dark:#9B5E47;--accent-light:#F0DDD4;--border:#E4DDD6;--green:#5BA05B;--green-light:#E8F5E8;--blue:#5B8EC4;--yellow:#E8C84A;--red-light:#FDECEC;--timer-active:#D4663A;--timer-bg:#FFF5F0;--rest-color:#8B6EC4;--rest-bg:#F3EEFA}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:15px;min-height:100vh;-webkit-tap-highlight-color:transparent;user-select:none;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.top-bar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 20px 10px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.top-bar h1{font-size:20px;font-weight:900;color:var(--accent-dark)}
+.top-bar .date-display{font-size:13px;color:var(--dim)}
+.total-timer-bar{background:var(--card);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:52px;z-index:99}
+.tt-label{font-size:13px;color:var(--dim)}
+.tt-time{font-size:22px;font-weight:900;color:var(--accent-dark);font-variant-numeric:tabular-nums}
+.tt-btn{padding:5px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:700;color:var(--dim);cursor:pointer;font-family:inherit}
+.tt-btn.active{background:var(--timer-bg);border-color:var(--timer-active);color:var(--timer-active)}
+.view-toggle{display:flex;margin:12px 20px 0;background:var(--card);border-radius:10px;border:1px solid var(--border);overflow:hidden}
+.view-btn{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:700;color:var(--dim);cursor:pointer;border:none;background:none}
+.view-btn.active{background:var(--accent);color:#fff}
+.container{max-width:800px;margin:0 auto;padding:0 20px 100px}
+.progress-section{display:flex;align-items:center;gap:20px;padding:16px 0}
+.ring-wrap{position:relative;width:72px;height:72px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:6}
+.ring-fill{fill:none;stroke:var(--green);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
+.ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:900;color:var(--green)}
+.progress-info{flex:1}
+.done-count{font-size:14px;color:var(--dim)}
+.streak{font-size:13px;color:var(--accent);font-weight:700;margin-top:2px}
+.category{margin-top:14px}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.cat-left{display:flex;align-items:center;gap:10px}
+.cat-dot{width:10px;height:10px;border-radius:50%}
+.cat-name{font-size:15px;font-weight:700}
+.cat-progress{font-size:12px;color:var(--dim);background:var(--green-light);padding:2px 8px;border-radius:10px}
+.cat-items{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:6px}
+.check-row{padding:12px 16px;border-bottom:1px solid #F0EBE6}
+.check-row:last-child{border-bottom:none}
+.check-row.done{opacity:.4}
+.check-top{display:flex;align-items:flex-start;gap:12px}
+.checkbox{flex-shrink:0;width:24px;height:24px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin-top:1px;cursor:pointer}
+.check-row.done .checkbox{background:var(--green);border-color:var(--green)}
+.checkbox::after{content:'';display:none}
+.check-row.done .checkbox::after{content:'✓';display:block;color:#fff;font-size:14px;font-weight:700}
+.check-info{flex:1;cursor:pointer}
+.check-title{font-size:14.5px;font-weight:500;line-height:1.5}
+.check-row.done .check-title{text-decoration:line-through}
+.check-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-top:2px}
+.check-time{font-size:11px;color:var(--accent);font-weight:700;background:var(--accent-light);padding:2px 8px;border-radius:6px}
+.toggle-detail{font-size:11px;color:var(--blue);cursor:pointer;padding:2px 0}
+.check-detail{font-size:12px;color:var(--dim);margin-top:6px;line-height:1.7;display:none;padding-left:36px}
+.check-detail.show{display:block}
+.timer-steps{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding-left:36px}
+.step-btn{display:flex;align-items:center;gap:3px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:11.5px;font-weight:700;color:var(--dim);cursor:pointer;white-space:nowrap;font-family:inherit}
+.step-btn:active{transform:scale(.95)}
+.step-btn.running{background:var(--timer-bg);border-color:var(--timer-active);color:var(--timer-active);animation:pulse 1.5s ease-in-out infinite}
+.step-btn.rest-running{background:var(--rest-bg);border-color:var(--rest-color);color:var(--rest-color);animation:pulse-r 1.5s ease-in-out infinite}
+.step-btn.completed{background:var(--green-light);border-color:var(--green);color:var(--green)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(212,102,58,.15)}50%{box-shadow:0 0 0 5px rgba(212,102,58,.08)}}
+@keyframes pulse-r{0%,100%{box-shadow:0 0 0 0 rgba(139,110,196,.15)}50%{box-shadow:0 0 0 5px rgba(139,110,196,.08)}}
+.floating-timer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 20px;border-radius:14px;font-weight:700;display:none;align-items:center;gap:10px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.2);cursor:pointer;max-width:calc(100% - 40px);padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+.floating-timer.show{display:flex}
+.ft-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:500;opacity:.8}
+.ft-time{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums}
+.ft-stop{background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-num{font-size:24px;font-weight:900;color:var(--accent-dark)}
+.stat-label{font-size:11px;color:var(--dim);margin-top:2px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px}
+.cal-weekday{text-align:center;font-size:12px;font-weight:700;color:var(--dim);padding:4px 0}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:14px;font-weight:500;background:var(--card);border:1px solid var(--border);cursor:pointer}
+.cal-day.empty{background:transparent;border:none}
+.cal-day.today{border-color:var(--accent);border-width:2px}
+.cal-day.future{opacity:.3}
+.cal-day.complete{background:var(--green);border-color:var(--green);color:#fff}
+.cal-day.partial{background:var(--green-light);border-color:#C8E6C8}
+.cal-day.missed{background:var(--red-light);border-color:#E8C8C8}
+.cal-day .day-pct{font-size:9px;font-weight:700;margin-top:1px}
+.cal-day.complete .day-pct{color:rgba(255,255,255,.8)}
+.month-header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 12px}
+.month-title{font-size:18px;font-weight:900;color:var(--accent-dark)}
+.nav-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:16px;cursor:pointer}
+.reset-bar{display:flex;gap:8px;padding:16px 0}
+.reset-btn{flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--dim);font-size:13px;cursor:pointer;text-align:center;font-weight:500}
 </style>
 </head>
 <body>
-
-<div class="top-bar">
-  <h1>每日打卡</h1>
-  <div class="date-display" id="dateDisplay"></div>
-</div>
-
+<div class="top-bar"><h1>每日打卡</h1><div class="date-display" id="dateDisplay"></div></div>
+<div class="total-timer-bar"><div><div class="tt-label">今日总用时</div></div><div class="tt-time" id="totalTime">0:00</div><button class="tt-btn" id="totalTimerBtn" onclick="toggleTotalTimer()">开始</button></div>
 <div class="container">
-  <div class="view-toggle">
-    <button class="view-btn active" onclick="showView('today')">今日任务</button>
-    <button class="view-btn" onclick="showView('calendar')">30天记录</button>
+  <div class="view-toggle"><button class="view-btn active" onclick="showView('today')">今日任务</button><button class="view-btn" onclick="showView('calendar')">30天记录</button></div>
+  <div id="todayView">
+    <div class="progress-section"><div class="ring-wrap"><svg width="72" height="72" viewBox="0 0 72 72"><circle class="ring-bg" cx="36" cy="36" r="30"/><circle class="ring-fill" id="ringFill" cx="36" cy="36" r="30" stroke-dasharray="188.5" stroke-dashoffset="188.5"/></svg><div class="ring-text" id="ringPct">0%</div></div><div class="progress-info"><div class="done-count" id="doneCount">已完成 0/23 项</div><div class="streak" id="streakDisplay">🔥 连续打卡 0 天</div></div></div>
+    <div id="itemsContainer"></div>
+    <div style="text-align:center;padding:16px 0;color:var(--dim);font-size:13px">全部做完约 65 分钟</div>
+    <div class="reset-bar"><button class="reset-btn" onclick="resetToday()">重置今日</button><button class="reset-btn" onclick="if(confirm('确定清除所有记录？'))clearAll()">清除所有</button></div>
   </div>
-
-  <div class="today-view" id="todayView">
-    <div class="progress-section">
-      <div class="ring-wrap">
-        <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle class="ring-bg" cx="40" cy="40" r="34"/>
-          <circle class="ring-fill" id="ringFill" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
-        </svg>
-        <div class="ring-text" id="ringPct">0%</div>
-      </div>
-      <div class="progress-info">
-        <div class="done-count" id="doneCount">已完成 0/22 项</div>
-        <div class="streak" id="streakDisplay">🔥 连续打卡 0 天</div>
-      </div>
-    </div>
-
-    <!-- 松解拉伸 -->
-    <div class="category">
-      <div class="cat-header"><div class="cat-left"><div class="cat-dot" style="background:#C4836A;"></div><div class="cat-name">松解拉伸</div></div><div class="cat-progress" id="cat1Progress">0/10</div></div>
-      <div class="cat-items" id="cat1">
-        <div class="check-row" data-id="r1" data-seconds="60"><div class="checkbox"></div><div class="check-info"><div class="check-title">脚底筋膜球松解</div><div class="check-detail">从脚后跟往脚趾滚，找痛点停留</div></div><div class="check-right"><div class="check-time">每脚1分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r1',60)"><span class="timer-icon">⏱</span><span class="timer-text">1:00</span></button></div></div>
-        <div class="check-row" data-id="r2" data-seconds="180"><div class="checkbox"></div><div class="check-info"><div class="check-title">大腿后侧松解+拉伸</div><div class="check-detail">云望滚找痛点停留20-30秒，滚完坐地上前俯拉伸30秒</div></div><div class="check-right"><div class="check-time">每侧3分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r2',180)"><span class="timer-icon">⏱</span><span class="timer-text">3:00</span></button></div></div>
-        <div class="check-row" data-id="r3" data-seconds="120"><div class="checkbox"></div><div class="check-info"><div class="check-title">小腿后侧松解+拉伸</div><div class="check-detail">云望滚找痛点，滚完面墙弓步压腿拉伸30秒</div></div><div class="check-right"><div class="check-time">每侧2分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r3',120)"><span class="timer-icon">⏱</span><span class="timer-text">2:00</span></button></div></div>
-        <div class="check-row" data-id="r4" data-seconds="180"><div class="checkbox"></div><div class="check-info"><div class="check-title">臀部深层松解+拉伸</div><div class="check-detail">筋膜球坐着压（云望不够深必须用球），翘二郎腿抱腿拉伸30秒</div></div><div class="check-right"><div class="check-time">每侧3分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r4',180)"><span class="timer-icon">⏱</span><span class="timer-text">3:00</span></button></div></div>
-        <div class="check-row" data-id="r5" data-seconds="180"><div class="checkbox"></div><div class="check-info"><div class="check-title">大腿前侧松解+拉伸</div><div class="check-detail">云望滚从大腿根到膝盖上方全覆盖，站着勾腿拉伸30秒</div></div><div class="check-right"><div class="check-time">每侧3分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r5',180)"><span class="timer-icon">⏱</span><span class="timer-text">3:00</span></button></div></div>
-        <div class="check-row" data-id="r6" data-seconds="120"><div class="checkbox"></div><div class="check-info"><div class="check-title">髂腰肌松解+拉伸</div><div class="check-detail">筋膜球趴着压肚脐斜下方（麻了马上挪），跪姿弓步拉伸30秒</div></div><div class="check-right"><div class="check-time">每侧2分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r6',120)"><span class="timer-icon">⏱</span><span class="timer-text">2:00</span></button></div></div>
-        <div class="check-row" data-id="r7" data-seconds="180"><div class="checkbox"></div><div class="check-info"><div class="check-title">大腿外侧松解+拉伸</div><div class="check-detail">云望滚髂胫束和阔筋膜张肌，交叉腿侧弯拉伸30秒</div></div><div class="check-right"><div class="check-time">每侧3分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r7',180)"><span class="timer-icon">⏱</span><span class="timer-text">3:00</span></button></div></div>
-        <div class="check-row" data-id="r8" data-seconds="300"><div class="checkbox"></div><div class="check-info"><div class="check-title">腰两侧松解+拉伸</div><div class="check-detail">花生球仰卧松解脊柱两侧，高的那侧多做。坐姿侧弯拉伸30秒。侧腰轻一点遇麻挪开</div></div><div class="check-right"><div class="check-time">共5分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r8',300)"><span class="timer-icon">⏱</span><span class="timer-text">5:00</span></button></div></div>
-        <div class="check-row" data-id="r9" data-seconds="90"><div class="checkbox"></div><div class="check-info"><div class="check-title">小腿前侧松解+拉伸</div><div class="check-detail">筋膜球手按小腿前外侧，跪坐脚背贴地拉伸30秒</div></div><div class="check-right"><div class="check-time">每侧1.5分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r9',90)"><span class="timer-icon">⏱</span><span class="timer-text">1:30</span></button></div></div>
-        <div class="check-row" data-id="r10" data-seconds="120"><div class="checkbox"></div><div class="check-info"><div class="check-title">大腿内侧松解+拉伸</div><div class="check-detail">云望滚内侧，蝴蝶坐拉伸30秒</div></div><div class="check-right"><div class="check-time">每侧2分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'r10',120)"><span class="timer-icon">⏱</span><span class="timer-text">2:00</span></button></div></div>
-      </div>
-    </div>
-
-    <!-- 足部训练 -->
-    <div class="category">
-      <div class="cat-header"><div class="cat-left"><div class="cat-dot" style="background:#5BA05B;"></div><div class="cat-name">足部训练</div></div><div class="cat-progress" id="cat2Progress">0/3</div></div>
-      <div class="cat-items" id="cat2">
-        <div class="check-row" data-id="f1" data-seconds="120"><div class="checkbox"></div><div class="check-info"><div class="check-title">足弓训练器 3组×15-20个</div><div class="check-detail">用脚心拱起来的力不是脚趾踩。调到15个脚底就酸的力度</div></div><div class="check-right"><div class="check-time">2分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'f1',120)"><span class="timer-icon">⏱</span><span class="timer-text">2:00</span></button></div></div>
-        <div class="check-row" data-id="f2" data-seconds="60"><div class="checkbox"></div><div class="check-info"><div class="check-title">短足训练 10次</div><div class="check-detail">赤脚站着脚心往上吸脚趾不动不抓地，每次保持5秒</div></div><div class="check-right"><div class="check-time">1分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'f2',60)"><span class="timer-icon">⏱</span><span class="timer-text">1:00</span></button></div></div>
-        <div class="check-row" data-id="f3" data-seconds="60"><div class="checkbox"></div><div class="check-info"><div class="check-title">大脚趾独立下压 10次</div><div class="check-detail">大脚趾压地小脚趾抬→反过来→交替。分不开也没关系每天练</div></div><div class="check-right"><div class="check-time">1分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'f3',60)"><span class="timer-icon">⏱</span><span class="timer-text">1:00</span></button></div></div>
-      </div>
-    </div>
-
-    <!-- 空手屈髋+中立位 -->
-    <div class="category">
-      <div class="cat-header"><div class="cat-left"><div class="cat-dot" style="background:#5B8EC4;"></div><div class="cat-name">空手屈髋 + 中立位练习</div></div><div class="cat-progress" id="cat3Progress">0/3</div></div>
-      <div class="cat-items" id="cat3">
-        <div class="check-row" data-id="h1" data-seconds="120"><div class="checkbox"></div><div class="check-info"><div class="check-title">找中立位（猫牛式10次）</div><div class="check-detail">四点跪姿反复弓腰撅屁股切换，缩小幅度停在中间。腰不累不弓那个位置就是中立位</div></div><div class="check-right"><div class="check-time">2分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'h1',120)"><span class="timer-icon">⏱</span><span class="timer-text">2:00</span></button></div></div>
-        <div class="check-row" data-id="h2" data-seconds="300"><div class="checkbox"></div><div class="check-info"><div class="check-title">空手屈髋 20-40个</div><div class="check-detail">手摸2号位（屁股侧面凹陷处！）。站直→微推屁股→推2号位往后拉开→脚蹬地屁股收缩回来。每下回到高位。慢慢做去感受</div></div><div class="check-right"><div class="check-time">5分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'h2',300)"><span class="timer-icon">⏱</span><span class="timer-text">5:00</span></button></div></div>
-        <div class="check-row" data-id="h3" data-seconds="60"><div class="checkbox"></div><div class="check-info"><div class="check-title">中立位站姿保持</div><div class="check-detail">站镜子前调整到中立位。重心整个脚掌不在后脚跟。膝盖不锁死。感受几秒记住</div></div><div class="check-right"><div class="check-time">1分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'h3',60)"><span class="timer-icon">⏱</span><span class="timer-text">1:00</span></button></div></div>
-      </div>
-    </div>
-
-    <!-- 核心训练 -->
-    <div class="category">
-      <div class="cat-header"><div class="cat-left"><div class="cat-dot" style="background:#E8C84A;"></div><div class="cat-name">核心训练</div></div><div class="cat-progress" id="cat4Progress">0/3</div></div>
-      <div class="cat-items" id="cat4">
-        <div class="check-row" data-id="c1" data-seconds="240"><div class="checkbox"></div><div class="check-info"><div class="check-title">超人式 3组×12个</div><div class="check-detail">趴地上同时抬上半身和双腿保持2-3秒放下来。到一条直线就停不要往上翘</div></div><div class="check-right"><div class="check-time">4分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'c1',240)"><span class="timer-icon">⏱</span><span class="timer-text">4:00</span></button></div></div>
-        <div class="check-row" data-id="c2" data-seconds="180"><div class="checkbox"></div><div class="check-info"><div class="check-title">死虫 2组×10个</div><div class="check-detail">躺着双手指天花板双腿抬起。对侧手脚慢慢伸出去腰全程贴地不拱</div></div><div class="check-right"><div class="check-time">3分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'c2',180)"><span class="timer-icon">⏱</span><span class="timer-text">3:00</span></button></div></div>
-        <div class="check-row" data-id="c3" data-seconds="180"><div class="checkbox"></div><div class="check-info"><div class="check-title">侧平板支撑 每侧2组×20-30秒</div><div class="check-detail">侧躺前臂撑地胯顶起来身体一条直线。弱的那侧多做一组。不会让腰变粗</div></div><div class="check-right"><div class="check-time">3分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'c3',180)"><span class="timer-icon">⏱</span><span class="timer-text">3:00</span></button></div></div>
-      </div>
-    </div>
-
-    <!-- 体态纠正 -->
-    <div class="category">
-      <div class="cat-header"><div class="cat-left"><div class="cat-dot" style="background:#B08AD4;"></div><div class="cat-name">体态纠正</div></div><div class="cat-progress" id="cat5Progress">0/3</div></div>
-      <div class="cat-items" id="cat5">
-        <div class="check-row" data-id="p1" data-seconds="60"><div class="checkbox"></div><div class="check-info"><div class="check-title">收下巴训练 10次</div><div class="check-detail">靠墙站或躺着把下巴往回收做双下巴保持5秒。改善头前引</div></div><div class="check-right"><div class="check-time">1分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'p1',60)"><span class="timer-icon">⏱</span><span class="timer-text">1:00</span></button></div></div>
-        <div class="check-row" data-id="p2" data-seconds="60"><div class="checkbox"></div><div class="check-info"><div class="check-title">胸前拉伸 每侧30秒</div><div class="check-detail">手搭门框身体前倾拉胸前和肩前侧。改善肩前扣</div></div><div class="check-right"><div class="check-time">1分钟</div><button class="timer-btn" onclick="event.stopPropagation();toggleTimer(this,'p2',60)"><span class="timer-icon">⏱</span><span class="timer-text">1:00</span></button></div></div>
-        <div class="check-row" data-id="p3"><div class="checkbox"></div><div class="check-info"><div class="check-title">吃够了吗？</div><div class="check-detail">今天每顿饭有肉有主食吃饱了吗？训练日训练后有喝蛋白粉吗？</div></div><div class="check-right"><div class="check-time">—</div></div></div>
-      </div>
-    </div>
-
-    <div style="text-align:center; padding:16px 0; color:var(--dim); font-size:13px;">
-      全部做完约 55-60 分钟 · 松解拉伸可AB组交替则约40分钟
-    </div>
-    <div class="reset-bar">
-      <button class="reset-btn" onclick="resetToday()">重置今日打勾</button>
-      <button class="reset-btn" onclick="if(confirm('确定要清除所有30天记录吗？'))clearAll()">清除所有记录</button>
-    </div>
-  </div>
-
-  <div class="calendar-view" id="calendarView">
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">总打卡天数</div></div>
-      <div class="stat-card"><div class="stat-num" id="statStreak">0</div><div class="stat-label">连续打卡</div></div>
-      <div class="stat-card"><div class="stat-num" id="statAvg">0%</div><div class="stat-label">平均完成率</div></div>
-    </div>
-    <div class="month-header">
-      <button onclick="changeMonth(-1)" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:16px;cursor:pointer;">‹</button>
-      <div class="month-title" id="monthTitle"></div>
-      <button onclick="changeMonth(1)" style="width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:16px;cursor:pointer;">›</button>
-    </div>
+  <div id="calendarView" style="display:none">
+    <div class="stats-grid"><div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">总打卡天数</div></div><div class="stat-card"><div class="stat-num" id="statStreak">0</div><div class="stat-label">连续打卡</div></div><div class="stat-card"><div class="stat-num" id="statAvg">0%</div><div class="stat-label">平均完成率</div></div></div>
+    <div class="month-header"><button class="nav-btn" onclick="changeMonth(-1)">‹</button><div class="month-title" id="monthTitle"></div><button class="nav-btn" onclick="changeMonth(1)">›</button></div>
     <div class="cal-grid" id="calGrid"></div>
-    <div id="dayDetail" style="display:none;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:10px;">
-        <div style="font-weight:700;font-size:15px;margin-bottom:8px;" id="dayDetailTitle"></div>
-        <div id="dayDetailContent" style="font-size:13px;color:var(--dim);"></div>
-      </div>
-    </div>
+    <div id="dayDetail" style="display:none"><div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:10px"><div style="font-weight:700;font-size:15px;margin-bottom:8px" id="dayDetailTitle"></div><div id="dayDetailContent" style="font-size:13px;color:var(--dim)"></div></div></div>
   </div>
 </div>
-
-<div class="floating-timer" id="floatingTimer">
-  <div class="ft-name" id="ftName"></div>
-  <div class="ft-time" id="ftTime"></div>
-  <button class="ft-stop" id="ftStop" onclick="event.stopPropagation();stopActiveTimer()">✕</button>
-</div>
-
+<div class="floating-timer" id="floatingTimer"><div class="ft-name" id="ftName"></div><div class="ft-time" id="ftTime"></div><button class="ft-stop" onclick="event.stopPropagation();stopActiveTimer()">✕</button></div>
 <script>
-// ═══════════ PWA Registration ═══════════
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+function playStart(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;o.type='sine';g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.2);o.start();o.stop(c.currentTime+.2)}catch(e){}}
+function playEnd(){try{const c=new(window.AudioContext||window.webkitAudioContext)();[0,.2,.4].forEach(d=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;o.type='sine';g.gain.setValueAtTime(.3,c.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d+.15);o.start(c.currentTime+d);o.stop(c.currentTime+d+.15)});if(navigator.vibrate)navigator.vibrate([200,100,200,100,200])}catch(e){}}
+const ITEMS=[
+{id:'r1',cat:0,name:'脚底筋膜球松解',time:'共3分钟',detail:'坐着或站着，筋膜球放脚底，从脚后跟慢慢滚到脚趾方向。遇痛点停住不动20-30秒等疼痛减轻。压力5-7分（10分最痛）。',steps:[{label:'左脚',sec:90},{label:'右脚',sec:90}]},
+{id:'r2',cat:0,name:'大腿后侧松解+拉伸',time:'共4分钟',detail:'松解：云望放大腿后侧膝盖上方，单腿做（另一条腿移开增加压力）。慢慢从膝盖上方滚到臀部下方，遇痛点停20-30秒。\n拉伸：坐地上一条腿伸直，身体前俯去够脚尖保持30秒不弹震。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
+{id:'r3',cat:0,name:'小腿后侧松解+拉伸',time:'共4分钟',detail:'松解：云望放小腿后侧，单腿做压力更大。从脚踝上方滚到膝盖下方。\n拉伸：面墙弓步，后腿伸直脚跟踩地感受小腿拉伸30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
+{id:'r4',cat:0,name:'臀部深层松解+拉伸',time:'共5分钟',detail:'松解：筋膜球放臀部中间偏外侧（梨状肌+臀中肌），坐上去翘二郎腿增压。也要压臀侧面凹陷处（臀中肌）。找痛点停住不要快速滚。\n拉伸：仰卧翘二郎腿，双手抱下方腿大腿往胸口拉30秒。',steps:[{label:'左松解',sec:120},{label:'左拉伸',sec:30},{label:'右松解',sec:120},{label:'右拉伸',sec:30}]},
+{id:'r5',cat:0,name:'大腿前侧松解+拉伸',time:'共4分钟',detail:'松解：趴着云望放大腿前侧，单腿做。从膝盖上方慢慢滚到大腿根部。\n拉伸：站着单腿勾腿（手拉脚背往臀部方向），膝盖朝下不外翻保持30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
+{id:'r6',cat:0,name:'髂腰肌松解+拉伸',time:'共4分钟',detail:'松解：趴着筋膜球放肚脐斜下方约2-3指宽处，一侧一侧做。轻轻压住不动，遇到麻马上挪开（压到神经）。\n拉伸：跪姿弓步后腿跪地前腿弓步，身体直立往前推髋30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
+{id:'r7',cat:0,name:'大腿外侧松解+拉伸',time:'共4分钟',detail:'松解：侧躺云望放大腿外侧，必须单腿做。从膝盖外侧上方滚到髋部外侧。含阔筋膜张肌+髂胫束。上面的腿踩地可减压。\n拉伸：交叉腿站立，身体向前腿方向侧弯30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
+{id:'r8',cat:0,name:'竖脊肌松解+拉伸',time:'共4分钟',detail:'松解：仰卧花生球放脊柱两侧（球夹住脊柱不压骨头）。慢慢上下滚。右侧更紧多做1分钟。\n拉伸：坐着身体侧弯，一只手过头往对侧伸30秒换边。',steps:[{label:'松解',sec:120},{label:'右侧额外',sec:60},{label:'左拉伸',sec:30},{label:'右拉伸',sec:30}]},
+{id:'r9',cat:0,name:'腰方肌松解+拉伸',time:'共4分钟',detail:'松解：侧躺筋膜球放腰后方、肋骨下缘和骨盆上缘之间（后腰两侧深处）。一侧做完换另一侧。轻柔地压不要太大力。\n拉伸：站着同侧手叉腰，对侧手过头往叉腰侧弯，感受后腰深处拉伸30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
+{id:'r10',cat:0,name:'小腿前侧松解+拉伸',time:'共3分钟',detail:'松解：坐着用筋膜球手按小腿前外侧（胫骨外侧肌肉不按骨头），找痛点停留。\n拉伸：跪坐脚背贴地，身体往后坐感受小腿前侧拉伸30秒。',steps:[{label:'左松解',sec:60},{label:'左拉伸',sec:30},{label:'右松解',sec:60},{label:'右拉伸',sec:30}]},
+{id:'r11',cat:0,name:'大腿内侧松解+拉伸',time:'共3:30',detail:'松解：趴着一条腿弯曲外展（像青蛙腿），云望放大腿内侧单腿做。从膝盖内侧上方滚到腹股沟方向。\n拉伸：蝴蝶坐（两脚掌合拢膝盖外展）身体前倾30秒。',steps:[{label:'左松解',sec:90},{label:'右松解',sec:90},{label:'蝴蝶坐拉伸',sec:30}]},
+{id:'f1',cat:1,name:'足弓训练器 3组×15-20个',time:'共3分钟',detail:'一只脚放训练器上，用脚心拱起来的力（足弓发力）踩，不是用脚趾抓。调到15个脚底就酸的阻力。一只脚做完3组再换。',steps:[{label:'左1组',sec:30},{label:'左2组',sec:30},{label:'左3组',sec:30},{label:'右1组',sec:30},{label:'右2组',sec:30},{label:'右3组',sec:30}]},
+{id:'f2',cat:1,name:'短足训练 每脚10次×5秒',time:'共2分钟',detail:'赤脚坐着一只脚放平。脚趾不动不抓地，想象把大脚趾根部往脚跟方向拉足弓自然拱起。看着脚确认脚趾没蜷缩。保持5秒放松做10次换脚。',steps:[{label:'左脚',sec:60},{label:'右脚',sec:60}]},
+{id:'f3',cat:1,name:'大脚趾独立下压 每脚10次',time:'共2分钟',detail:'赤脚坐着脚放平。大脚趾用力往下压地面同时小脚趾抬起来→反过来小脚趾压地大脚趾抬→交替做。分不开没关系每天尝试就好。一只脚做完换。',steps:[{label:'左脚',sec:60},{label:'右脚',sec:60}]},
+{id:'h1',cat:2,name:'猫牛式找中立位 10次',time:'2分钟',detail:'四点跪姿（手在肩正下方膝盖在髋正下方）。慢慢弓腰（猫式：背上拱低头）→撅屁股（牛式：腰下塌抬头）→反复切换。逐渐缩小幅度停在中间，腰不累不弓就是中立位。',steps:[{label:'开始',sec:120}]},
+{id:'h2',cat:2,name:'空手屈髋 20-40个',time:'5分钟',detail:'站直双手摸2号位（屁股侧面凹陷处不是后面！）。站直→微推屁股往后→用手引导2号位往后拉开→脚蹬地用臀部力量拉回站直。每下回到完全站直。慢慢做感受臀部发力。',steps:[{label:'开始',sec:300}]},
+{id:'h3',cat:2,name:'中立位站姿保持',time:'1分钟',detail:'站镜子前调到中立位。重心放整个脚掌上（不是后脚跟）。膝盖微弯不锁死。注意重心是否偏到左腿，尽量两腿均匀分配。',steps:[{label:'保持',sec:60}]},
+{id:'c1',cat:3,name:'超人式 3组×10-12个',time:'共5:30',detail:'趴地上双手过头伸直双腿伸直。同时轻轻抬起上半身和双腿离地几厘米就够（不要拼命高抬！）。保持2-3秒慢慢放下。下巴微收看地面脖子不上仰。臀部先收紧再抬保护腰。',steps:[{label:'第1组',sec:90},{label:'休息',sec:30,rest:true},{label:'第2组',sec:90},{label:'休息',sec:30,rest:true},{label:'第3组',sec:90}]},
+{id:'c2',cat:3,name:'死虫 3组×8个/侧',time:'共5:30',detail:'躺地上腰贴地（做后倾骨盆，你有前倾这步特别重要）。双手指天花板双腿抬起膝盖弯90度。呼气时对侧手脚同时慢慢伸出去，全程腰贴地不拱——腰要拱就缩小幅度。吸气收回换侧。慢做。',steps:[{label:'第1组',sec:90},{label:'休息',sec:30,rest:true},{label:'第2组',sec:90},{label:'休息',sec:30,rest:true},{label:'第3组',sec:90}]},
+{id:'c3',cat:3,name:'侧平板支撑 每侧2组×30秒',time:'共2:45',detail:'侧躺前臂撑地肘在肩正下方。胯用力顶起来身体成一条直线（头-肩-胯-脚踝一条线）。不让胯掉。弱的那侧可多做一组。',steps:[{label:'左1组',sec:30},{label:'休息',sec:15,rest:true},{label:'左2组',sec:30},{label:'休息',sec:15,rest:true},{label:'右1组',sec:30},{label:'休息',sec:15,rest:true},{label:'右2组',sec:30}]},
+{id:'p1',cat:4,name:'收下巴训练 10次×5秒',time:'1分钟',detail:'靠墙站或仰卧。下巴往回收（做双下巴动作），不是低头是整个头往后平移。保持5秒放松。改善头前引。',steps:[{label:'开始',sec:60}]},
+{id:'p2',cat:4,name:'胸前拉伸 每侧30秒',time:'1分钟',detail:'站门框旁把前臂搭门框上（肘跟肩同高），身体慢慢前倾过门框感受胸前和肩前侧拉伸。不耸肩。一侧做完换。',steps:[{label:'左',sec:30},{label:'右',sec:30}]},
+{id:'p3',cat:4,name:'吃够了吗？',time:'—',detail:'你44kg，每天蛋白质目标66克（44×1.5）。三餐每餐约22克。训练日训练后2小时内加一勺蛋白粉（20-25克）。\n\n每份约20-25克蛋白质＝一个手掌大的鸡胸肉/牛肉/鱼（约100克）＝2个鸡蛋+1杯牛奶＝一碗豆腐（约200克）＝一勺蛋白粉。\n\n每顿饭：一手掌大的肉/鱼 + 一拳头大的主食 + 一大把蔬菜。训练日多吃半碗饭。\n\n你BMI偏低，每天至少1400-1600大卡，三顿正餐都吃饱不要少吃。',steps:[]},
+];
+const CATS=[{name:'松解拉伸',color:'#C4836A',ids:['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11']},{name:'足部训练',color:'#5BA05B',ids:['f1','f2','f3']},{name:'空手屈髋 + 中立位',color:'#5B8EC4',ids:['h1','h2','h3']},{name:'核心训练',color:'#E8C84A',ids:['c1','c2','c3']},{name:'体态纠正',color:'#B08AD4',ids:['p1','p2','p3']}];
+const TOTAL_ITEMS=ITEMS.length,ITEM_IDS=ITEMS.map(i=>i.id);
+let totalTimerInterval=null,totalTimerSeconds=0,totalTimerRunning=false;
+function toggleTotalTimer(){const btn=document.getElementById('totalTimerBtn');if(totalTimerRunning){totalTimerRunning=false;clearInterval(totalTimerInterval);btn.textContent='继续';btn.classList.remove('active')}else{totalTimerRunning=true;totalTimerInterval=setInterval(()=>{totalTimerSeconds++;document.getElementById('totalTime').textContent=formatTime(totalTimerSeconds)},1000);btn.textContent='暂停';btn.classList.add('active')}}
+let activeTimer=null;
+function formatTime(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function startStep(itemId,stepIdx){
+  const item=ITEMS.find(i=>i.id===itemId);if(!item||stepIdx>=item.steps.length)return;
+  for(let i=0;i<stepIdx;i++){const pb=document.querySelector(`[data-item="${itemId}"][data-step="${i}"]`);if(pb&&!pb.classList.contains('completed'))return}
+  const step=item.steps[stepIdx],btn=document.querySelector(`[data-item="${itemId}"][data-step="${stepIdx}"]`);
+  if(!btn||btn.classList.contains('completed'))return;
+  if(activeTimer){if(activeTimer.itemId===itemId&&activeTimer.stepIdx===stepIdx){if(activeTimer.paused){activeTimer.paused=false;btn.classList.add(step.rest?'rest-running':'running');activeTimer.interval=setInterval(()=>tickStep(),1000)}else{activeTimer.paused=true;clearInterval(activeTimer.interval);btn.classList.remove('running','rest-running')}return}stopActiveTimer()}
+  if(!totalTimerRunning)toggleTotalTimer();
+  playStart();
+  activeTimer={itemId,stepIdx,btn,remaining:step.sec,total:step.sec,name:item.name+' · '+step.label,paused:false,isRest:!!step.rest,interval:setInterval(()=>tickStep(),1000)};
+  btn.classList.add(step.rest?'rest-running':'running');btn.querySelector('.s-time').textContent=formatTime(step.sec);updateFloating()
 }
-
-// ═══════════ TIMER SYSTEM ═══════════
-let activeTimer = null;
-
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return m + ':' + String(s).padStart(2, '0');
-}
-
-function playAlarm() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [0, 0.2, 0.4].forEach(delay => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain); gain.connect(ctx.destination);
-      osc.frequency.value = 880; osc.type = 'sine';
-      gain.gain.setValueAtTime(0.3, ctx.currentTime + delay);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.15);
-      osc.start(ctx.currentTime + delay);
-      osc.stop(ctx.currentTime + delay + 0.15);
-    });
-    if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
-  } catch(e) {}
-}
-
-function toggleTimer(btn, id, totalSeconds) {
-  if (activeTimer && activeTimer.id === id) {
-    if (activeTimer.paused) {
-      activeTimer.paused = false;
-      btn.classList.add('running'); btn.classList.remove('finished');
-      activeTimer.interval = setInterval(() => tickTimer(), 1000);
-    } else {
-      activeTimer.paused = true;
-      clearInterval(activeTimer.interval);
-      btn.classList.remove('running');
-    }
-    return;
-  }
-  if (activeTimer) stopActiveTimer();
-
-  const row = btn.closest('.check-row');
-  const name = row.querySelector('.check-title').textContent;
-  activeTimer = { id, btn, remaining: totalSeconds, total: totalSeconds, name, paused: false,
-    interval: setInterval(() => tickTimer(), 1000) };
-  btn.classList.add('running');
-  btn.querySelector('.timer-text').textContent = formatTime(totalSeconds);
-  updateFloatingTimer();
-}
-
-function tickTimer() {
-  if (!activeTimer) return;
-  activeTimer.remaining--;
-  const txt = formatTime(activeTimer.remaining);
-  activeTimer.btn.querySelector('.timer-text').textContent = txt;
-  updateFloatingTimer();
-
-  if (activeTimer.remaining <= 0) {
-    clearInterval(activeTimer.interval);
-    playAlarm();
-    activeTimer.btn.classList.remove('running');
-    activeTimer.btn.classList.add('finished');
-    activeTimer.btn.querySelector('.timer-icon').textContent = '✓';
-    activeTimer.btn.querySelector('.timer-text').textContent = '完成!';
-
-    const row = activeTimer.btn.closest('.check-row');
-    if (!row.classList.contains('done')) {
-      row.classList.add('done');
-      saveTodayItem(activeTimer.id, true);
-      updateProgress();
-    }
-
-    const finishedBtn = activeTimer.btn;
-    const finishedTotal = activeTimer.total;
-    setTimeout(() => {
-      finishedBtn.classList.remove('finished');
-      finishedBtn.querySelector('.timer-icon').textContent = '⏱';
-      finishedBtn.querySelector('.timer-text').textContent = formatTime(finishedTotal);
-    }, 2500);
-
-    activeTimer = null;
-    hideFloatingTimer();
-  }
-}
-
-function stopActiveTimer() {
-  if (!activeTimer) return;
-  clearInterval(activeTimer.interval);
-  activeTimer.btn.classList.remove('running', 'finished');
-  activeTimer.btn.querySelector('.timer-icon').textContent = '⏱';
-  activeTimer.btn.querySelector('.timer-text').textContent = formatTime(activeTimer.total);
-  activeTimer = null;
-  hideFloatingTimer();
-}
-
-function updateFloatingTimer() {
-  if (!activeTimer) return;
-  document.getElementById('ftName').textContent = activeTimer.name;
-  document.getElementById('ftTime').textContent = formatTime(activeTimer.remaining);
-  const btnRect = activeTimer.btn.getBoundingClientRect();
-  const isVisible = btnRect.top > -20 && btnRect.bottom < window.innerHeight + 20;
-  document.getElementById('floatingTimer').classList.toggle('show', !isVisible);
-}
-
-function hideFloatingTimer() {
-  document.getElementById('floatingTimer').classList.remove('show');
-}
-
-window.addEventListener('scroll', () => { if (activeTimer) updateFloatingTimer(); }, { passive: true });
-document.getElementById('floatingTimer').addEventListener('click', function(e) {
-  if (e.target.id === 'ftStop') return;
-  if (activeTimer) activeTimer.btn.closest('.check-row').scrollIntoView({ behavior: 'smooth', block: 'center' });
-});
-
-// ═══════════ DATA ═══════════
-const TOTAL_ITEMS = 22;
-const ITEM_IDS = ['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','f1','f2','f3','h1','h2','h3','c1','c2','c3','p1','p2','p3'];
-const CAT_MAP = { cat1:['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10'], cat2:['f1','f2','f3'], cat3:['h1','h2','h3'], cat4:['c1','c2','c3'], cat5:['p1','p2','p3'] };
-
-function getDateKey(d) {
-  const dd = d || new Date();
-  return dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
-}
-function loadData() { try { return JSON.parse(localStorage.getItem('dailyCheck')||'{}'); } catch(e) { return {}; } }
-function saveData(data) { localStorage.setItem('dailyCheck', JSON.stringify(data)); }
-function getTodayData() { const data=loadData(); return data[getDateKey()]||{}; }
-function saveTodayItem(id, checked) { const data=loadData(); const key=getDateKey(); if(!data[key])data[key]={}; data[key][id]=checked; saveData(data); }
-
-function initToday() {
-  const today = new Date();
-  document.getElementById('dateDisplay').textContent = today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日';
-  const todayData = getTodayData();
-  document.querySelectorAll('.check-row').forEach(row => {
-    const id = row.dataset.id;
-    if (todayData[id]) row.classList.add('done'); else row.classList.remove('done');
-    const checkbox = row.querySelector('.checkbox');
-    const info = row.querySelector('.check-info');
-    if (checkbox) checkbox.onclick = (e) => { e.stopPropagation(); toggleItem(row); };
-    if (info) info.onclick = (e) => { e.stopPropagation(); toggleItem(row); };
-  });
-  updateProgress();
-}
-
-function toggleItem(row) {
-  const id = row.dataset.id;
-  const isDone = row.classList.toggle('done');
-  saveTodayItem(id, isDone);
-  updateProgress();
-}
-
-function updateProgress() {
-  const todayData = getTodayData();
-  let done = 0;
-  ITEM_IDS.forEach(id => { if (todayData[id]) done++; });
-  const pct = Math.round((done/TOTAL_ITEMS)*100);
-  document.getElementById('ringPct').textContent = pct+'%';
-  document.getElementById('doneCount').textContent = '已完成 '+done+'/'+TOTAL_ITEMS+' 项';
-  const circ = 2*Math.PI*34;
-  document.getElementById('ringFill').style.strokeDashoffset = circ-(circ*pct/100);
-  Object.keys(CAT_MAP).forEach(catId => {
-    const ids = CAT_MAP[catId]; let catDone=0;
-    ids.forEach(id => { if(todayData[id]) catDone++; });
-    const el = document.getElementById(catId+'Progress');
-    if(el) el.textContent = catDone+'/'+ids.length;
-  });
-  document.getElementById('streakDisplay').textContent = '🔥 连续打卡 '+calcStreak()+' 天';
-}
-
-function calcStreak() {
-  const data=loadData(); let streak=0; const today=new Date();
-  const todayKey=getDateKey(today); const todayData=data[todayKey]||{}; let todayDone=0;
-  ITEM_IDS.forEach(id=>{if(todayData[id])todayDone++;});
-  if(todayDone>=Math.floor(TOTAL_ITEMS*0.5)) streak=1;
-  else { const yd=new Date(today); yd.setDate(yd.getDate()-1); const ydData=data[getDateKey(yd)]||{}; let yDone=0; ITEM_IDS.forEach(id=>{if(ydData[id])yDone++;}); if(yDone<Math.floor(TOTAL_ITEMS*0.5)) return 0; }
-  let d=new Date(today);
-  if(todayDone<Math.floor(TOTAL_ITEMS*0.5)) d.setDate(d.getDate()-1);
-  while(true) { const k=getDateKey(d); const dd=data[k]||{}; let cnt=0; ITEM_IDS.forEach(id=>{if(dd[id])cnt++;});
-    if(cnt>=Math.floor(TOTAL_ITEMS*0.5)){if(d.getTime()!==today.getTime()||todayDone>=Math.floor(TOTAL_ITEMS*0.5))streak++;d.setDate(d.getDate()-1);}else break;
-    if(streak>365)break; }
-  return streak;
-}
-
-function resetToday() { const data=loadData(); data[getDateKey()]={}; saveData(data); stopActiveTimer(); initToday(); }
-function clearAll() { localStorage.removeItem('dailyCheck'); stopActiveTimer(); initToday(); if(document.getElementById('calendarView').style.display!=='none') renderCalendar(); }
-
-function showView(view) {
-  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
-  if(view==='today'){document.getElementById('todayView').style.display='block';document.getElementById('calendarView').style.display='none';document.querySelectorAll('.view-btn')[0].classList.add('active');}
-  else{document.getElementById('todayView').style.display='none';document.getElementById('calendarView').style.display='block';document.querySelectorAll('.view-btn')[1].classList.add('active');renderCalendar();}
-}
-
-let calMonth=new Date().getMonth(), calYear=new Date().getFullYear();
-function changeMonth(delta){calMonth+=delta;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
-
-function renderCalendar() {
-  const data=loadData(); const today=new Date(); const todayKey=getDateKey(today);
-  document.getElementById('monthTitle').textContent=calYear+'年'+(calMonth+1)+'月';
-  const firstDay=new Date(calYear,calMonth,1).getDay(); const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
-  let html='';
-  ['日','一','二','三','四','五','六'].forEach(d=>{html+='<div class="cal-weekday">'+d+'</div>';});
-  for(let i=0;i<firstDay;i++) html+='<div class="cal-day empty"></div>';
-  let totalDays=0,totalPct=0;
-  for(let d=1;d<=daysInMonth;d++){
-    const date=new Date(calYear,calMonth,d); const key=getDateKey(date); const dayData=data[key]||{};
-    let done=0; ITEM_IDS.forEach(id=>{if(dayData[id])done++;}); const pct=Math.round((done/TOTAL_ITEMS)*100);
-    const isToday=key===todayKey; const isFuture=date>today;
-    let cls='cal-day'; if(isToday)cls+=' today'; if(isFuture)cls+=' future';
-    else if(done>0){totalDays++;totalPct+=pct;if(pct>=80)cls+=' complete';else if(pct>0)cls+=' partial';}
-    else if(!isToday&&date<today){if(Math.floor((today-date)/86400000)<=30)cls+=' missed';}
-    html+='<div class="'+cls+'" onclick="showDayDetail(\''+key+'\','+d+')">';
-    html+='<div class="day-num">'+d+'</div>';
-    if(!isFuture&&done>0) html+='<div class="day-pct">'+pct+'%</div>';
-    html+='</div>';
-  }
-  document.getElementById('calGrid').innerHTML=html;
-  document.getElementById('statTotal').textContent=totalDays;
-  document.getElementById('statStreak').textContent=calcStreak();
-  document.getElementById('statAvg').textContent=totalDays>0?Math.round(totalPct/totalDays)+'%':'0%';
-}
-
-function showDayDetail(key, dayNum) {
-  const data=loadData(); const dayData=data[key]||{}; let done=0;
-  ITEM_IDS.forEach(id=>{if(dayData[id])done++;});
-  if(done===0){document.getElementById('dayDetail').style.display='none';return;}
-  document.getElementById('dayDetail').style.display='block';
-  document.getElementById('dayDetailTitle').textContent=(calMonth+1)+'月'+dayNum+'日 · 完成 '+done+'/'+TOTAL_ITEMS;
-  const names={r1:'脚底松解',r2:'大腿后侧',r3:'小腿后侧',r4:'臀部深层',r5:'大腿前侧',r6:'髂腰肌',r7:'大腿外侧',r8:'腰两侧',r9:'小腿前侧',r10:'大腿内侧',f1:'足弓训练器',f2:'短足训练',f3:'大脚趾下压',h1:'猫牛式',h2:'空手屈髋',h3:'中立位站姿',c1:'超人式',c2:'死虫',c3:'侧平板',p1:'收下巴',p2:'胸前拉伸',p3:'吃够了'};
-  let content=''; ITEM_IDS.forEach(id=>{
-    if(dayData[id])content+='<span style="color:var(--green);">✓</span> '+names[id]+'　';
-    else content+='<span style="opacity:0.3;">✗ '+names[id]+'</span>　';
-  });
-  document.getElementById('dayDetailContent').innerHTML=content;
-}
-
-initToday();
+function tickStep(){if(!activeTimer)return;activeTimer.remaining--;activeTimer.btn.querySelector('.s-time').textContent=formatTime(activeTimer.remaining);updateFloating();
+  if(activeTimer.remaining<=0){clearInterval(activeTimer.interval);playEnd();activeTimer.btn.classList.remove('running','rest-running');activeTimer.btn.classList.add('completed');activeTimer.btn.querySelector('.s-icon').textContent='✓';activeTimer.btn.querySelector('.s-time').textContent='完成';
+    const iId=activeTimer.itemId,sIdx=activeTimer.stepIdx,item=ITEMS.find(i=>i.id===iId);activeTimer=null;hideFloating();
+    const allDone=item.steps.every((_,i)=>{const b=document.querySelector(`[data-item="${iId}"][data-step="${i}"]`);return b&&b.classList.contains('completed')});
+    if(allDone){const row=document.querySelector(`.check-row[data-id="${iId}"]`);if(row&&!row.classList.contains('done')){row.classList.add('done');saveTodayItem(iId,true);updateProgress()}}
+    if(sIdx+1<item.steps.length)setTimeout(()=>startStep(iId,sIdx+1),500)}}
+function stopActiveTimer(){if(!activeTimer)return;clearInterval(activeTimer.interval);const item=ITEMS.find(i=>i.id===activeTimer.itemId),step=item.steps[activeTimer.stepIdx];activeTimer.btn.classList.remove('running','rest-running');activeTimer.btn.querySelector('.s-icon').textContent='⏱';activeTimer.btn.querySelector('.s-time').textContent=formatTime(activeTimer.total);activeTimer=null;hideFloating()}
+function updateFloating(){if(!activeTimer)return;document.getElementById('ftName').textContent=activeTimer.name;document.getElementById('ftTime').textContent=formatTime(activeTimer.remaining);const r=activeTimer.btn.getBoundingClientRect();document.getElementById('floatingTimer').classList.toggle('show',!(r.top>-20&&r.bottom<window.innerHeight+20))}
+function hideFloating(){document.getElementById('floatingTimer').classList.remove('show')}
+window.addEventListener('scroll',()=>{if(activeTimer)updateFloating()},{passive:true});
+document.getElementById('floatingTimer').addEventListener('click',e=>{if(e.target.classList.contains('ft-stop'))return;if(activeTimer)activeTimer.btn.scrollIntoView({behavior:'smooth',block:'center'})});
+function renderItems(){const c=document.getElementById('itemsContainer');let h='';
+  CATS.forEach((cat,ci)=>{h+=`<div class="category"><div class="cat-header"><div class="cat-left"><div class="cat-dot" style="background:${cat.color}"></div><div class="cat-name">${cat.name}</div></div><div class="cat-progress" id="cat${ci}Progress">0/${cat.ids.length}</div></div><div class="cat-items">`;
+    cat.ids.forEach(id=>{const item=ITEMS.find(i=>i.id===id);const dt=item.detail.replace(/\n/g,'<br>');
+      h+=`<div class="check-row" data-id="${id}"><div class="check-top"><div class="checkbox" onclick="event.stopPropagation();toggleItem(this.closest('.check-row'))"></div><div class="check-info" onclick="event.stopPropagation();toggleItem(this.closest('.check-row'))"><div class="check-title">${item.name}</div></div><div class="check-right"><div class="check-time">${item.time}</div><div class="toggle-detail" onclick="event.stopPropagation();toggleDetail('${id}')">展开 ▾</div></div></div><div class="check-detail" id="detail-${id}">${dt}</div>`;
+      if(item.steps.length>0){h+=`<div class="timer-steps">`;item.steps.forEach((s,si)=>{h+=`<button class="step-btn" data-item="${id}" data-step="${si}" onclick="event.stopPropagation();startStep('${id}',${si})"><span class="s-icon">⏱</span><span class="s-time">${formatTime(s.sec)}</span><span class="s-label">${s.label}</span></button>`});h+=`</div>`}
+      h+=`</div>`});h+=`</div></div>`});c.innerHTML=h}
+function toggleDetail(id){const el=document.getElementById('detail-'+id);el.classList.toggle('show');const row=el.closest('.check-row'),t=row.querySelector('.toggle-detail');if(t)t.textContent=el.classList.contains('show')?'收起 ▴':'展开 ▾'}
+function getDateKey(d){const dd=d||new Date();return dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0')}
+function loadData(){try{return JSON.parse(localStorage.getItem('dailyCheck')||'{}')}catch(e){return{}}}
+function saveData(d){localStorage.setItem('dailyCheck',JSON.stringify(d))}
+function getTodayData(){return loadData()[getDateKey()]||{}}
+function saveTodayItem(id,v){const d=loadData(),k=getDateKey();if(!d[k])d[k]={};d[k][id]=v;saveData(d)}
+function initToday(){const t=new Date();document.getElementById('dateDisplay').textContent=t.getFullYear()+'年'+(t.getMonth()+1)+'月'+t.getDate()+'日';const td=getTodayData();document.querySelectorAll('.check-row').forEach(r=>{if(td[r.dataset.id])r.classList.add('done');else r.classList.remove('done')});updateProgress()}
+function toggleItem(row){const id=row.dataset.id;const isDone=row.classList.toggle('done');saveTodayItem(id,isDone);updateProgress()}
+function updateProgress(){const td=getTodayData();let done=0;ITEM_IDS.forEach(id=>{if(td[id])done++});const pct=Math.round(done/TOTAL_ITEMS*100);document.getElementById('ringPct').textContent=pct+'%';document.getElementById('doneCount').textContent='已完成 '+done+'/'+TOTAL_ITEMS+' 项';const circ=2*Math.PI*30;document.getElementById('ringFill').style.strokeDashoffset=circ-(circ*pct/100);CATS.forEach((cat,ci)=>{let cd=0;cat.ids.forEach(id=>{if(td[id])cd++});const el=document.getElementById('cat'+ci+'Progress');if(el)el.textContent=cd+'/'+cat.ids.length});document.getElementById('streakDisplay').textContent='🔥 连续打卡 '+calcStreak()+' 天'}
+function calcStreak(){const data=loadData();let streak=0;const today=new Date(),todayKey=getDateKey(today),todayData=data[todayKey]||{};let todayDone=0;ITEM_IDS.forEach(id=>{if(todayData[id])todayDone++});const half=Math.floor(TOTAL_ITEMS*.5);if(todayDone>=half)streak=1;else{const yd=new Date(today);yd.setDate(yd.getDate()-1);const ydData=data[getDateKey(yd)]||{};let yDone=0;ITEM_IDS.forEach(id=>{if(ydData[id])yDone++});if(yDone<half)return 0}let d=new Date(today);if(todayDone<half)d.setDate(d.getDate()-1);while(true){const k=getDateKey(d),dd=data[k]||{};let cnt=0;ITEM_IDS.forEach(id=>{if(dd[id])cnt++});if(cnt>=half){if(d.getTime()!==today.getTime()||todayDone>=half)streak++;d.setDate(d.getDate()-1)}else break;if(streak>365)break}return streak}
+function resetToday(){const d=loadData();d[getDateKey()]={};saveData(d);stopActiveTimer();totalTimerRunning=false;clearInterval(totalTimerInterval);totalTimerSeconds=0;document.getElementById('totalTime').textContent='0:00';document.getElementById('totalTimerBtn').textContent='开始';document.getElementById('totalTimerBtn').classList.remove('active');document.querySelectorAll('.step-btn').forEach(b=>{b.classList.remove('completed','running','rest-running');b.querySelector('.s-icon').textContent='⏱';const item=ITEMS.find(i=>i.id===b.dataset.item);if(item){const s=item.steps[parseInt(b.dataset.step)];if(s)b.querySelector('.s-time').textContent=formatTime(s.sec)}});initToday()}
+function clearAll(){localStorage.removeItem('dailyCheck');resetToday();if(document.getElementById('calendarView').style.display!=='none')renderCalendar()}
+function showView(v){document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));if(v==='today'){document.getElementById('todayView').style.display='block';document.getElementById('calendarView').style.display='none';document.querySelectorAll('.view-btn')[0].classList.add('active')}else{document.getElementById('todayView').style.display='none';document.getElementById('calendarView').style.display='block';document.querySelectorAll('.view-btn')[1].classList.add('active');renderCalendar()}}
+let calMonth=new Date().getMonth(),calYear=new Date().getFullYear();
+function changeMonth(delta){calMonth+=delta;if(calMonth>11){calMonth=0;calYear++}if(calMonth<0){calMonth=11;calYear--}renderCalendar()}
+function renderCalendar(){const data=loadData(),today=new Date(),todayKey=getDateKey(today);document.getElementById('monthTitle').textContent=calYear+'年'+(calMonth+1)+'月';const firstDay=new Date(calYear,calMonth,1).getDay(),daysInMonth=new Date(calYear,calMonth+1,0).getDate();let html='';['日','一','二','三','四','五','六'].forEach(d=>{html+='<div class="cal-weekday">'+d+'</div>'});for(let i=0;i<firstDay;i++)html+='<div class="cal-day empty"></div>';let totalDays=0,totalPct=0;for(let d=1;d<=daysInMonth;d++){const date=new Date(calYear,calMonth,d),key=getDateKey(date),dayData=data[key]||{};let done=0;ITEM_IDS.forEach(id=>{if(dayData[id])done++});const pct=Math.round(done/TOTAL_ITEMS*100);const isToday=key===todayKey,isFuture=date>today;let cls='cal-day';if(isToday)cls+=' today';if(isFuture)cls+=' future';else if(done>0){totalDays++;totalPct+=pct;if(pct>=80)cls+=' complete';else if(pct>0)cls+=' partial'}else if(!isToday&&date<today&&Math.floor((today-date)/86400000)<=30)cls+=' missed';html+='<div class="'+cls+'" onclick="showDayDetail(\''+key+'\','+d+')"><div class="day-num">'+d+'</div>';if(!isFuture&&done>0)html+='<div class="day-pct">'+pct+'%</div>';html+='</div>'}document.getElementById('calGrid').innerHTML=html;document.getElementById('statTotal').textContent=totalDays;document.getElementById('statStreak').textContent=calcStreak();document.getElementById('statAvg').textContent=totalDays>0?Math.round(totalPct/totalDays)+'%':'0%'}
+function showDayDetail(key,dayNum){const data=loadData(),dayData=data[key]||{};let done=0;ITEM_IDS.forEach(id=>{if(dayData[id])done++});if(!done){document.getElementById('dayDetail').style.display='none';return}document.getElementById('dayDetail').style.display='block';document.getElementById('dayDetailTitle').textContent=(calMonth+1)+'月'+dayNum+'日 · 完成 '+done+'/'+TOTAL_ITEMS;let content='';ITEM_IDS.forEach(id=>{const item=ITEMS.find(i=>i.id===id);if(dayData[id])content+='<span style="color:var(--green)">✓</span> '+item.name+'　';else content+='<span style="opacity:.3">✗ '+item.name+'</span>　'});document.getElementById('dayDetailContent').innerHTML=content}
+renderItems();initToday();
 </script>
 </body>
 </html>
