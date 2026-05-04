@@ -57,7 +57,7 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 .check-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-top:2px}
 .check-time{font-size:11px;color:var(--accent);font-weight:700;background:var(--accent-light);padding:2px 8px;border-radius:6px}
 .toggle-detail{font-size:11px;color:var(--blue);cursor:pointer;padding:2px 0}
-.check-detail{font-size:12px;color:var(--dim);margin-top:6px;line-height:1.7;display:none;padding-left:36px}
+.check-detail{font-size:12px;color:var(--dim);margin-top:2px;line-height:1.6;display:none;padding-left:36px}
 .check-detail.show{display:block}
 .timer-steps{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding-left:36px}
 .step-btn{display:flex;align-items:center;gap:3px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:11.5px;font-weight:700;color:var(--dim);cursor:pointer;white-space:nowrap;font-family:inherit}
@@ -115,8 +115,10 @@ body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text
 <div class="floating-timer" id="floatingTimer"><div class="ft-name" id="ftName"></div><div class="ft-time" id="ftTime"></div><button class="ft-stop" onclick="event.stopPropagation();stopActiveTimer()">✕</button></div>
 <script>
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-function playStart(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;o.type='sine';g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.2);o.start();o.stop(c.currentTime+.2)}catch(e){}}
-function playEnd(){try{const c=new(window.AudioContext||window.webkitAudioContext)();[0,.2,.4].forEach(d=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;o.type='sine';g.gain.setValueAtTime(.3,c.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d+.15);o.start(c.currentTime+d);o.stop(c.currentTime+d+.15)});if(navigator.vibrate)navigator.vibrate([200,100,200,100,200])}catch(e){}}
+let _audioCtx=null;
+function getAudioCtx(){if(!_audioCtx||_audioCtx.state==='closed')_audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(_audioCtx.state==='suspended')_audioCtx.resume();return _audioCtx}
+function playStart(){try{const c=getAudioCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;o.type='sine';g.gain.setValueAtTime(.25,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start();o.stop(c.currentTime+.25)}catch(e){}}
+function playEnd(){try{const c=getAudioCtx();[0,.25,.5].forEach(d=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=d===0?780:d===.25?880:1040;o.type='sine';g.gain.setValueAtTime(.4,c.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d+.2);o.start(c.currentTime+d);o.stop(c.currentTime+d+.2)});if(navigator.vibrate)navigator.vibrate([200,100,200,100,200])}catch(e){}}
 const ITEMS=[
 {id:'r1',cat:0,name:'脚底筋膜球松解',time:'共3分钟',detail:'坐着或站着，筋膜球放脚底，从脚后跟慢慢滚到脚趾方向。遇痛点停住不动20-30秒等疼痛减轻。压力5-7分（10分最痛）。',steps:[{label:'左脚',sec:90},{label:'右脚',sec:90}]},
 {id:'r2',cat:0,name:'大腿后侧松解+拉伸',time:'共4分钟',detail:'松解：云望放大腿后侧膝盖上方，单腿做（另一条腿移开增加压力）。慢慢从膝盖上方滚到臀部下方，遇痛点停20-30秒。\n拉伸：坐地上一条腿伸直，身体前俯去够脚尖保持30秒不弹震。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'daily-tracker-v1';
+const CACHE_NAME = 'daily-tracker-v2';
 const urlsToCache = [
   '/daily-tracker/',
   '/daily-tracker/index.html',
