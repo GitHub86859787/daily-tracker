@@ -7,195 +7,308 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="每日打卡">
-<meta name="theme-color" content="#C4836A">
+<meta name="theme-color" content="#E8DDD3">
 <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 <link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#F5F0EB;--card:#FFF;--text:#2C2C2C;--dim:#8A8480;--accent:#C4836A;--accent-dark:#9B5E47;--accent-light:#F0DDD4;--border:#E4DDD6;--green:#5BA05B;--green-light:#E8F5E8;--blue:#5B8EC4;--yellow:#E8C84A;--red-light:#FDECEC;--timer-active:#D4663A;--timer-bg:#FFF5F0;--rest-color:#8B6EC4;--rest-bg:#F3EEFA}
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:15px;min-height:100vh;-webkit-tap-highlight-color:transparent;user-select:none;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-.top-bar{background:var(--card);border-bottom:1px solid var(--border);padding:14px 20px 10px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.top-bar h1{font-size:20px;font-weight:900;color:var(--accent-dark)}
-.top-bar .date-display{font-size:13px;color:var(--dim)}
-.total-timer-bar{background:var(--card);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:52px;z-index:99}
-.tt-label{font-size:13px;color:var(--dim)}
-.tt-time{font-size:22px;font-weight:900;color:var(--accent-dark);font-variant-numeric:tabular-nums}
-.tt-btn{padding:5px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:700;color:var(--dim);cursor:pointer;font-family:inherit}
-.tt-btn.active{background:var(--timer-bg);border-color:var(--timer-active);color:var(--timer-active)}
-.view-toggle{display:flex;margin:12px 20px 0;background:var(--card);border-radius:10px;border:1px solid var(--border);overflow:hidden}
-.view-btn{flex:1;padding:10px;text-align:center;font-size:14px;font-weight:700;color:var(--dim);cursor:pointer;border:none;background:none}
-.view-btn.active{background:var(--accent);color:#fff}
-.container{max-width:800px;margin:0 auto;padding:0 20px 100px}
-.progress-section{display:flex;align-items:center;gap:20px;padding:16px 0}
-.ring-wrap{position:relative;width:72px;height:72px;flex-shrink:0}
-.ring-wrap svg{transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:var(--border);stroke-width:6}
-.ring-fill{fill:none;stroke:var(--green);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .5s ease}
-.ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:18px;font-weight:900;color:var(--green)}
-.progress-info{flex:1}
-.done-count{font-size:14px;color:var(--dim)}
-.streak{font-size:13px;color:var(--accent);font-weight:700;margin-top:2px}
-.category{margin-top:14px}
-.cat-header{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
-.cat-left{display:flex;align-items:center;gap:10px}
-.cat-dot{width:10px;height:10px;border-radius:50%}
-.cat-name{font-size:15px;font-weight:700}
-.cat-progress{font-size:12px;color:var(--dim);background:var(--green-light);padding:2px 8px;border-radius:10px}
-.cat-items{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:6px}
-.check-row{padding:12px 16px;border-bottom:1px solid #F0EBE6}
-.check-row:last-child{border-bottom:none}
-.check-row.done{opacity:.4}
-.check-top{display:flex;align-items:flex-start;gap:12px}
-.checkbox{flex-shrink:0;width:24px;height:24px;border-radius:7px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;margin-top:1px;cursor:pointer}
-.check-row.done .checkbox{background:var(--green);border-color:var(--green)}
-.checkbox::after{content:'';display:none}
-.check-row.done .checkbox::after{content:'✓';display:block;color:#fff;font-size:14px;font-weight:700}
-.check-info{flex:1;cursor:pointer}
-.check-title{font-size:14.5px;font-weight:500;line-height:1.5}
-.check-row.done .check-title{text-decoration:line-through}
-.check-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-top:2px}
-.check-time{font-size:11px;color:var(--accent);font-weight:700;background:var(--accent-light);padding:2px 8px;border-radius:6px}
-.toggle-detail{font-size:11px;color:var(--blue);cursor:pointer;padding:2px 0}
-.check-detail{font-size:12px;color:var(--dim);margin-top:2px;line-height:1.6;display:none;padding-left:36px}
-.check-detail.show{display:block}
-.timer-steps{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;padding-left:36px}
-.step-btn{display:flex;align-items:center;gap:3px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--card);font-size:11.5px;font-weight:700;color:var(--dim);cursor:pointer;white-space:nowrap;font-family:inherit}
-.step-btn:active{transform:scale(.95)}
-.step-btn.running{background:var(--timer-bg);border-color:var(--timer-active);color:var(--timer-active);animation:pulse 1.5s ease-in-out infinite}
-.step-btn.rest-running{background:var(--rest-bg);border-color:var(--rest-color);color:var(--rest-color);animation:pulse-r 1.5s ease-in-out infinite}
-.step-btn.completed{background:var(--green-light);border-color:var(--green);color:var(--green)}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(212,102,58,.15)}50%{box-shadow:0 0 0 5px rgba(212,102,58,.08)}}
-@keyframes pulse-r{0%,100%{box-shadow:0 0 0 0 rgba(139,110,196,.15)}50%{box-shadow:0 0 0 5px rgba(139,110,196,.08)}}
-.floating-timer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 20px;border-radius:14px;font-weight:700;display:none;align-items:center;gap:10px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.2);cursor:pointer;max-width:calc(100% - 40px);padding-bottom:calc(10px + env(safe-area-inset-bottom))}
-.floating-timer.show{display:flex}
-.ft-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:500;opacity:.8}
-.ft-time{font-size:18px;font-weight:900;font-variant-numeric:tabular-nums}
-.ft-stop{background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:50%;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
-.stat-num{font-size:24px;font-weight:900;color:var(--accent-dark)}
-.stat-label{font-size:11px;color:var(--dim);margin-top:2px}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px}
-.cal-weekday{text-align:center;font-size:12px;font-weight:700;color:var(--dim);padding:4px 0}
-.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:14px;font-weight:500;background:var(--card);border:1px solid var(--border);cursor:pointer}
-.cal-day.empty{background:transparent;border:none}
-.cal-day.today{border-color:var(--accent);border-width:2px}
-.cal-day.future{opacity:.3}
-.cal-day.complete{background:var(--green);border-color:var(--green);color:#fff}
-.cal-day.partial{background:var(--green-light);border-color:#C8E6C8}
-.cal-day.missed{background:var(--red-light);border-color:#E8C8C8}
-.cal-day .day-pct{font-size:9px;font-weight:700;margin-top:1px}
-.cal-day.complete .day-pct{color:rgba(255,255,255,.8)}
-.month-header{display:flex;align-items:center;justify-content:space-between;padding:20px 0 12px}
-.month-title{font-size:18px;font-weight:900;color:var(--accent-dark)}
-.nav-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:16px;cursor:pointer}
-.reset-bar{display:flex;gap:8px;padding:16px 0}
-.reset-btn{flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--dim);font-size:13px;cursor:pointer;text-align:center;font-weight:500}
+:root{
+  --sand:#F6F1EB;--cream:#FFFDF9;--clay:#D4A574;--clay2:#C08B5C;--clay3:#A67548;
+  --ink:#3D3229;--stone:#9C948A;--mist:#E8E2DA;--silk:#F0EAE2;
+  --sage:#7BA06B;--sage2:#5C8A4E;--sage-bg:#EEF4EB;
+  --sky:#6B99B5;--sky-bg:#EBF2F6;
+  --amber:#D4944A;--amber-bg:#FFF3E6;
+  --plum:#9B7BB5;--plum-bg:#F3EEF8;
+  --rose:#C47070;--rose-bg:#FAEEEE;
+  --r:16px
+}
+html{background:var(--sand)}
+body{font-family:'Noto Sans SC','Outfit',sans-serif;background:var(--sand);color:var(--ink);font-size:15px;line-height:1.6;min-height:100vh;min-height:100dvh;-webkit-tap-highlight-color:transparent;user-select:none;overflow-x:hidden}
+
+/* ── Texture bg ── */
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4A574' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+
+/* ── Hero Header ── */
+.hero{position:relative;padding:28px 24px 20px;padding-top:calc(28px + env(safe-area-inset-top));z-index:1}
+.hero-date{font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--stone);letter-spacing:1px;text-transform:uppercase}
+.hero-title{font-family:'Outfit',sans-serif;font-size:32px;font-weight:900;color:var(--ink);letter-spacing:-.5px;margin-top:2px}
+.hero-sub{font-size:13px;color:var(--stone);margin-top:2px}
+
+/* ── Sticky Timer Bar ── */
+.timer-dock{position:sticky;top:0;z-index:100;padding:0 16px;margin-bottom:4px}
+.timer-dock-inner{background:var(--cream);border:1px solid var(--mist);border-radius:var(--r);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 20px rgba(60,50,41,.06),0 1px 3px rgba(60,50,41,.04)}
+.td-left{display:flex;align-items:center;gap:14px}
+.td-label{font-size:12px;color:var(--stone);font-weight:500}
+.td-time{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;color:var(--clay2);font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.td-btn{font-family:'Outfit',sans-serif;padding:8px 20px;border-radius:24px;border:none;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .2s}
+.td-btn.go{background:var(--clay);color:#fff;box-shadow:0 2px 8px rgba(212,165,116,.3)}
+.td-btn.go:active{transform:scale(.96);box-shadow:0 1px 4px rgba(212,165,116,.2)}
+.td-btn.stop{background:var(--silk);color:var(--clay2);border:1.5px solid var(--mist)}
+
+/* ── Progress Card ── */
+.prog{position:relative;z-index:1;margin:12px 16px 0;background:var(--cream);border:1px solid var(--mist);border-radius:var(--r);padding:18px 20px;display:flex;align-items:center;gap:18px;box-shadow:0 2px 12px rgba(60,50,41,.04)}
+.ring{position:relative;width:58px;height:58px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--silk);stroke-width:5}
+.ring-fg{fill:none;stroke:var(--sage);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)}
+.ring-num{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:var(--sage2)}
+.prog-text{flex:1}
+.prog-done{font-size:14px;color:var(--stone)}
+.prog-done b{color:var(--ink);font-weight:700}
+.prog-streak{font-size:13px;color:var(--clay2);font-weight:600;margin-top:1px}
+
+/* ── Tabs ── */
+.tabs{display:flex;margin:16px 16px 0;background:var(--cream);border-radius:12px;padding:3px;border:1px solid var(--mist)}
+.tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;color:var(--stone);cursor:pointer;border:none;background:none;border-radius:10px;transition:all .25s;font-family:inherit}
+.tab.on{background:var(--ink);color:var(--cream);box-shadow:0 2px 8px rgba(60,50,41,.12)}
+
+.wrap{max-width:800px;margin:0 auto;padding:0 16px 120px;position:relative;z-index:1}
+
+/* ── Section ── */
+.sec{margin-top:20px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:0 4px 8px}
+.sec-left{display:flex;align-items:center;gap:8px}
+.sec-icon{width:28px;height:28px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.sec-name{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.2px}
+.sec-cnt{font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px}
+.sec-body{background:var(--cream);border:1px solid var(--mist);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 12px rgba(60,50,41,.03)}
+
+/* ── Item ── */
+.it{padding:14px 16px;border-bottom:1px solid var(--silk);position:relative}
+.it:last-child{border-bottom:none}
+.it.done{opacity:.3}
+.it-top{display:flex;align-items:flex-start;gap:10px}
+
+/* drag */
+.grip{width:16px;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center;cursor:grab;touch-action:none;flex-shrink:0;padding:4px 0;opacity:.25;transition:opacity .2s}
+.grip:active{opacity:.6}
+.grip i{display:block;width:10px;height:1.5px;background:var(--stone);border-radius:1px}
+.it.dragging{opacity:.3;background:var(--silk)}
+.it.drag-over{box-shadow:inset 0 2px 0 var(--clay)}
+
+/* check */
+.ck{width:22px;height:22px;border-radius:7px;border:2px solid var(--mist);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;margin-top:1px}
+.it.done .ck{background:var(--sage);border-color:var(--sage)}
+.it.done .ck::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+
+.it-body{flex:1;min-width:0;cursor:pointer}
+.it-name{font-size:14px;font-weight:600;line-height:1.4}
+.it.done .it-name{text-decoration:line-through;color:var(--stone)}
+
+.it-meta{flex-shrink:0;text-align:right}
+.it-dur{font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--clay2);background:var(--amber-bg);padding:2px 10px;border-radius:20px}
+.it-tog{font-size:11px;color:var(--sky);cursor:pointer;margin-top:5px;font-weight:500}
+
+/* detail */
+.it-det{display:none;font-size:12.5px;color:var(--stone);line-height:1.7;padding:4px 0 2px 32px}
+.it-det.open{display:block}
+
+/* steps */
+.stp-row{display:flex;flex-wrap:wrap;gap:6px;padding:8px 0 0 32px}
+.stp{font-family:'Outfit',sans-serif;display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:24px;border:1.5px solid var(--mist);background:var(--cream);font-size:12px;font-weight:600;color:var(--stone);cursor:pointer;transition:all .2s;white-space:nowrap}
+.stp:active{transform:scale(.95)}
+.stp .st{font-variant-numeric:tabular-nums;font-weight:700}
+.stp .sl{font-weight:500;font-size:11px;opacity:.7}
+.stp.on{border-color:var(--clay);color:var(--clay3);background:var(--amber-bg);box-shadow:0 0 0 3px rgba(212,165,116,.12);animation:breathe 2.5s ease-in-out infinite}
+.stp.rest-on{border-color:var(--plum);color:var(--plum);background:var(--plum-bg);box-shadow:0 0 0 3px rgba(155,123,181,.1);animation:breathe-p 2.5s ease-in-out infinite}
+.stp.ok{border-color:var(--sage);color:var(--sage2);background:var(--sage-bg)}
+.stp.wait{border-color:var(--amber);color:var(--amber);animation:blink .8s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 3px rgba(212,165,116,.12)}50%{box-shadow:0 0 0 8px rgba(212,165,116,.06)}}
+@keyframes breathe-p{0%,100%{box-shadow:0 0 0 3px rgba(155,123,181,.1)}50%{box-shadow:0 0 0 8px rgba(155,123,181,.05)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── Float ── */
+.flt{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--cream);padding:12px 22px;border-radius:24px;display:none;align-items:center;gap:14px;z-index:200;box-shadow:0 12px 40px rgba(30,24,18,.3);cursor:pointer;max-width:calc(100% - 32px);padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+.flt.show{display:flex}
+.flt-info{flex:1;overflow:hidden}
+.flt-n{font-size:11px;opacity:.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.flt-l{font-size:13px;font-weight:600}
+.flt-t{font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+.flt-x{background:rgba(255,255,255,.12);border:none;color:var(--cream);width:28px;height:28px;border-radius:50%;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── Calendar ── */
+.st-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.st-c{background:var(--cream);border:1px solid var(--mist);border-radius:var(--r);padding:16px;text-align:center;box-shadow:0 2px 8px rgba(60,50,41,.03)}
+.st-n{font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;color:var(--clay2)}
+.st-l{font-size:11px;color:var(--stone);margin-top:2px}
+.c-head{display:flex;align-items:center;justify-content:space-between;padding:16px 0 10px}
+.c-title{font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;color:var(--ink)}
+.c-nav{width:34px;height:34px;border-radius:10px;border:1px solid var(--mist);background:var(--cream);font-size:16px;cursor:pointer;color:var(--ink)}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cw{text-align:center;font-size:11px;font-weight:600;color:var(--stone);padding:4px 0}
+.cd{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:13px;font-weight:500;background:var(--cream);border:1px solid var(--mist);cursor:pointer}
+.cd.e{background:transparent;border:none}
+.cd.td{border-color:var(--clay);border-width:2px}
+.cd.fu{opacity:.25}
+.cd.fl{background:var(--sage);border-color:var(--sage);color:#fff}
+.cd.pt{background:var(--sage-bg);border-color:#c8dfc0}
+.cd.ms{background:var(--rose-bg);border-color:#e0c8c8}
+.cd .dp{font-size:8px;font-weight:700;margin-top:1px}
+.cd.fl .dp{color:rgba(255,255,255,.75)}
+
+.rst-bar{display:flex;gap:8px;padding:16px 0}
+.rst{flex:1;padding:12px;border:1px solid var(--mist);border-radius:12px;background:var(--cream);color:var(--stone);font-size:13px;cursor:pointer;text-align:center;font-weight:500;font-family:inherit}
+.rst:active{background:var(--silk)}
 </style>
 </head>
 <body>
-<div class="top-bar"><h1>每日打卡</h1><div class="date-display" id="dateDisplay"></div></div>
-<div class="total-timer-bar"><div><div class="tt-label">今日总用时</div></div><div class="tt-time" id="totalTime">0:00</div><button class="tt-btn" id="totalTimerBtn" onclick="toggleTotalTimer()">开始</button></div>
-<div class="container">
-  <div class="view-toggle"><button class="view-btn active" onclick="showView('today')">今日任务</button><button class="view-btn" onclick="showView('calendar')">30天记录</button></div>
-  <div id="todayView">
-    <div class="progress-section"><div class="ring-wrap"><svg width="72" height="72" viewBox="0 0 72 72"><circle class="ring-bg" cx="36" cy="36" r="30"/><circle class="ring-fill" id="ringFill" cx="36" cy="36" r="30" stroke-dasharray="188.5" stroke-dashoffset="188.5"/></svg><div class="ring-text" id="ringPct">0%</div></div><div class="progress-info"><div class="done-count" id="doneCount">已完成 0/23 项</div><div class="streak" id="streakDisplay">🔥 连续打卡 0 天</div></div></div>
-    <div id="itemsContainer"></div>
-    <div style="text-align:center;padding:16px 0;color:var(--dim);font-size:13px">全部做完约 65 分钟</div>
-    <div class="reset-bar"><button class="reset-btn" onclick="resetToday()">重置今日</button><button class="reset-btn" onclick="if(confirm('确定清除所有记录？'))clearAll()">清除所有</button></div>
+<div class="hero">
+  <div class="hero-date" id="hDate"></div>
+  <div class="hero-title">每日打卡</div>
+  <div class="hero-sub">坚持松解 · 改善体态 · 记录成长</div>
+</div>
+
+<div class="timer-dock"><div class="timer-dock-inner">
+  <div class="td-left"><div><div class="td-label">总用时</div><div class="td-time" id="ttTime">0:00</div></div></div>
+  <button class="td-btn go" id="ttBtn" onclick="toggleTT()">开始</button>
+</div></div>
+
+<div class="wrap">
+  <div class="prog">
+    <div class="ring"><svg width="58" height="58" viewBox="0 0 58 58"><circle class="ring-bg" cx="29" cy="29" r="24"/><circle class="ring-fg" id="rF" cx="29" cy="29" r="24" stroke-dasharray="150.8" stroke-dashoffset="150.8"/></svg><div class="ring-num" id="rP">0%</div></div>
+    <div class="prog-text"><div class="prog-done" id="pD">已完成 <b>0</b>/17 项</div><div class="prog-streak" id="pS">🔥 连续 0 天</div></div>
   </div>
-  <div id="calendarView" style="display:none">
-    <div class="stats-grid"><div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">总打卡天数</div></div><div class="stat-card"><div class="stat-num" id="statStreak">0</div><div class="stat-label">连续打卡</div></div><div class="stat-card"><div class="stat-num" id="statAvg">0%</div><div class="stat-label">平均完成率</div></div></div>
-    <div class="month-header"><button class="nav-btn" onclick="changeMonth(-1)">‹</button><div class="month-title" id="monthTitle"></div><button class="nav-btn" onclick="changeMonth(1)">›</button></div>
-    <div class="cal-grid" id="calGrid"></div>
-    <div id="dayDetail" style="display:none"><div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:10px"><div style="font-weight:700;font-size:15px;margin-bottom:8px" id="dayDetailTitle"></div><div id="dayDetailContent" style="font-size:13px;color:var(--dim)"></div></div></div>
+
+  <div class="tabs"><button class="tab on" onclick="showV('today')">今日任务</button><button class="tab" onclick="showV('cal')">打卡记录</button></div>
+
+  <div id="vT">
+    <div id="box"></div>
+    <div style="text-align:center;padding:14px 0;color:var(--stone);font-size:12px">约55分钟 · 长按拖动可调顺序</div>
+    <div class="rst-bar"><button class="rst" onclick="resetDay()">重置今日</button><button class="rst" onclick="if(confirm('清除所有记录？'))clearAll()">清除所有</button></div>
+  </div>
+
+  <div id="vC" style="display:none">
+    <div class="st-row"><div class="st-c"><div class="st-n" id="sT">0</div><div class="st-l">打卡天数</div></div><div class="st-c"><div class="st-n" id="sS">0</div><div class="st-l">连续打卡</div></div><div class="st-c"><div class="st-n" id="sA">0%</div><div class="st-l">平均完成</div></div></div>
+    <div class="c-head"><button class="c-nav" onclick="chgM(-1)">‹</button><div class="c-title" id="mT"></div><button class="c-nav" onclick="chgM(1)">›</button></div>
+    <div class="cg" id="cG"></div>
+    <div id="dD" style="display:none"><div style="background:var(--cream);border:1px solid var(--mist);border-radius:var(--r);padding:16px;margin-top:10px;box-shadow:0 2px 8px rgba(60,50,41,.03)"><div style="font-weight:700;font-size:14px;margin-bottom:6px" id="dT"></div><div id="dC" style="font-size:12px;color:var(--stone);line-height:2"></div></div></div>
   </div>
 </div>
-<div class="floating-timer" id="floatingTimer"><div class="ft-name" id="ftName"></div><div class="ft-time" id="ftTime"></div><button class="ft-stop" onclick="event.stopPropagation();stopActiveTimer()">✕</button></div>
+
+<div class="flt" id="flt" onclick="scrollA()">
+  <div class="flt-info"><div class="flt-n" id="fN"></div><div class="flt-l" id="fL"></div></div>
+  <div class="flt-t" id="fT"></div>
+  <button class="flt-x" onclick="event.stopPropagation();stopT()">✕</button>
+</div>
+
 <script>
-if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-let _audioCtx=null;
-function getAudioCtx(){if(!_audioCtx||_audioCtx.state==='closed')_audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(_audioCtx.state==='suspended')_audioCtx.resume();return _audioCtx}
-function playStart(){try{const c=getAudioCtx(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;o.type='sine';g.gain.setValueAtTime(.25,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.25);o.start();o.stop(c.currentTime+.25)}catch(e){}}
-function playEnd(){try{const c=getAudioCtx();[0,.25,.5].forEach(d=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=d===0?780:d===.25?880:1040;o.type='sine';g.gain.setValueAtTime(.4,c.currentTime+d);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d+.2);o.start(c.currentTime+d);o.stop(c.currentTime+d+.2)});if(navigator.vibrate)navigator.vibrate([200,100,200,100,200])}catch(e){}}
-const ITEMS=[
-{id:'r1',cat:0,name:'脚底筋膜球松解',time:'共3分钟',detail:'坐着或站着，筋膜球放脚底，从脚后跟慢慢滚到脚趾方向。遇痛点停住不动20-30秒等疼痛减轻。压力5-7分（10分最痛）。',steps:[{label:'左脚',sec:90},{label:'右脚',sec:90}]},
-{id:'r2',cat:0,name:'大腿后侧松解+拉伸',time:'共4分钟',detail:'松解：云望放大腿后侧膝盖上方，单腿做（另一条腿移开增加压力）。慢慢从膝盖上方滚到臀部下方，遇痛点停20-30秒。\n拉伸：坐地上一条腿伸直，身体前俯去够脚尖保持30秒不弹震。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
-{id:'r3',cat:0,name:'小腿后侧松解+拉伸',time:'共4分钟',detail:'松解：云望放小腿后侧，单腿做压力更大。从脚踝上方滚到膝盖下方。\n拉伸：面墙弓步，后腿伸直脚跟踩地感受小腿拉伸30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
-{id:'r4',cat:0,name:'臀部深层松解+拉伸',time:'共5分钟',detail:'松解：筋膜球放臀部中间偏外侧（梨状肌+臀中肌），坐上去翘二郎腿增压。也要压臀侧面凹陷处（臀中肌）。找痛点停住不要快速滚。\n拉伸：仰卧翘二郎腿，双手抱下方腿大腿往胸口拉30秒。',steps:[{label:'左松解',sec:120},{label:'左拉伸',sec:30},{label:'右松解',sec:120},{label:'右拉伸',sec:30}]},
-{id:'r5',cat:0,name:'大腿前侧松解+拉伸',time:'共4分钟',detail:'松解：趴着云望放大腿前侧，单腿做。从膝盖上方慢慢滚到大腿根部。\n拉伸：站着单腿勾腿（手拉脚背往臀部方向），膝盖朝下不外翻保持30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
-{id:'r6',cat:0,name:'髂腰肌松解+拉伸',time:'共4分钟',detail:'松解：趴着筋膜球放肚脐斜下方约2-3指宽处，一侧一侧做。轻轻压住不动，遇到麻马上挪开（压到神经）。\n拉伸：跪姿弓步后腿跪地前腿弓步，身体直立往前推髋30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
-{id:'r7',cat:0,name:'大腿外侧松解+拉伸',time:'共4分钟',detail:'松解：侧躺云望放大腿外侧，必须单腿做。从膝盖外侧上方滚到髋部外侧。含阔筋膜张肌+髂胫束。上面的腿踩地可减压。\n拉伸：交叉腿站立，身体向前腿方向侧弯30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
-{id:'r8',cat:0,name:'竖脊肌松解+拉伸',time:'共4分钟',detail:'松解：仰卧花生球放脊柱两侧（球夹住脊柱不压骨头）。慢慢上下滚。右侧更紧多做1分钟。\n拉伸：坐着身体侧弯，一只手过头往对侧伸30秒换边。',steps:[{label:'松解',sec:120},{label:'右侧额外',sec:60},{label:'左拉伸',sec:30},{label:'右拉伸',sec:30}]},
-{id:'r9',cat:0,name:'腰方肌松解+拉伸',time:'共4分钟',detail:'松解：侧躺筋膜球放腰后方、肋骨下缘和骨盆上缘之间（后腰两侧深处）。一侧做完换另一侧。轻柔地压不要太大力。\n拉伸：站着同侧手叉腰，对侧手过头往叉腰侧弯，感受后腰深处拉伸30秒。',steps:[{label:'左松解',sec:90},{label:'左拉伸',sec:30},{label:'右松解',sec:90},{label:'右拉伸',sec:30}]},
-{id:'r10',cat:0,name:'小腿前侧松解+拉伸',time:'共3分钟',detail:'松解：坐着用筋膜球手按小腿前外侧（胫骨外侧肌肉不按骨头），找痛点停留。\n拉伸：跪坐脚背贴地，身体往后坐感受小腿前侧拉伸30秒。',steps:[{label:'左松解',sec:60},{label:'左拉伸',sec:30},{label:'右松解',sec:60},{label:'右拉伸',sec:30}]},
-{id:'r11',cat:0,name:'大腿内侧松解+拉伸',time:'共3:30',detail:'松解：趴着一条腿弯曲外展（像青蛙腿），云望放大腿内侧单腿做。从膝盖内侧上方滚到腹股沟方向。\n拉伸：蝴蝶坐（两脚掌合拢膝盖外展）身体前倾30秒。',steps:[{label:'左松解',sec:90},{label:'右松解',sec:90},{label:'蝴蝶坐拉伸',sec:30}]},
-{id:'f1',cat:1,name:'足弓训练器 3组×15-20个',time:'共3分钟',detail:'一只脚放训练器上，用脚心拱起来的力（足弓发力）踩，不是用脚趾抓。调到15个脚底就酸的阻力。一只脚做完3组再换。',steps:[{label:'左1组',sec:30},{label:'左2组',sec:30},{label:'左3组',sec:30},{label:'右1组',sec:30},{label:'右2组',sec:30},{label:'右3组',sec:30}]},
-{id:'f2',cat:1,name:'短足训练 每脚10次×5秒',time:'共2分钟',detail:'赤脚坐着一只脚放平。脚趾不动不抓地，想象把大脚趾根部往脚跟方向拉足弓自然拱起。看着脚确认脚趾没蜷缩。保持5秒放松做10次换脚。',steps:[{label:'左脚',sec:60},{label:'右脚',sec:60}]},
-{id:'f3',cat:1,name:'大脚趾独立下压 每脚10次',time:'共2分钟',detail:'赤脚坐着脚放平。大脚趾用力往下压地面同时小脚趾抬起来→反过来小脚趾压地大脚趾抬→交替做。分不开没关系每天尝试就好。一只脚做完换。',steps:[{label:'左脚',sec:60},{label:'右脚',sec:60}]},
-{id:'h1',cat:2,name:'猫牛式找中立位 10次',time:'2分钟',detail:'四点跪姿（手在肩正下方膝盖在髋正下方）。慢慢弓腰（猫式：背上拱低头）→撅屁股（牛式：腰下塌抬头）→反复切换。逐渐缩小幅度停在中间，腰不累不弓就是中立位。',steps:[{label:'开始',sec:120}]},
-{id:'h2',cat:2,name:'空手屈髋 20-40个',time:'5分钟',detail:'站直双手摸2号位（屁股侧面凹陷处不是后面！）。站直→微推屁股往后→用手引导2号位往后拉开→脚蹬地用臀部力量拉回站直。每下回到完全站直。慢慢做感受臀部发力。',steps:[{label:'开始',sec:300}]},
-{id:'h3',cat:2,name:'中立位站姿保持',time:'1分钟',detail:'站镜子前调到中立位。重心放整个脚掌上（不是后脚跟）。膝盖微弯不锁死。注意重心是否偏到左腿，尽量两腿均匀分配。',steps:[{label:'保持',sec:60}]},
-{id:'c1',cat:3,name:'超人式 3组×10-12个',time:'共5:30',detail:'趴地上双手过头伸直双腿伸直。同时轻轻抬起上半身和双腿离地几厘米就够（不要拼命高抬！）。保持2-3秒慢慢放下。下巴微收看地面脖子不上仰。臀部先收紧再抬保护腰。',steps:[{label:'第1组',sec:90},{label:'休息',sec:30,rest:true},{label:'第2组',sec:90},{label:'休息',sec:30,rest:true},{label:'第3组',sec:90}]},
-{id:'c2',cat:3,name:'死虫 3组×8个/侧',time:'共5:30',detail:'躺地上腰贴地（做后倾骨盆，你有前倾这步特别重要）。双手指天花板双腿抬起膝盖弯90度。呼气时对侧手脚同时慢慢伸出去，全程腰贴地不拱——腰要拱就缩小幅度。吸气收回换侧。慢做。',steps:[{label:'第1组',sec:90},{label:'休息',sec:30,rest:true},{label:'第2组',sec:90},{label:'休息',sec:30,rest:true},{label:'第3组',sec:90}]},
-{id:'c3',cat:3,name:'侧平板支撑 每侧2组×30秒',time:'共2:45',detail:'侧躺前臂撑地肘在肩正下方。胯用力顶起来身体成一条直线（头-肩-胯-脚踝一条线）。不让胯掉。弱的那侧可多做一组。',steps:[{label:'左1组',sec:30},{label:'休息',sec:15,rest:true},{label:'左2组',sec:30},{label:'休息',sec:15,rest:true},{label:'右1组',sec:30},{label:'休息',sec:15,rest:true},{label:'右2组',sec:30}]},
-{id:'p1',cat:4,name:'收下巴训练 10次×5秒',time:'1分钟',detail:'靠墙站或仰卧。下巴往回收（做双下巴动作），不是低头是整个头往后平移。保持5秒放松。改善头前引。',steps:[{label:'开始',sec:60}]},
-{id:'p2',cat:4,name:'胸前拉伸 每侧30秒',time:'1分钟',detail:'站门框旁把前臂搭门框上（肘跟肩同高），身体慢慢前倾过门框感受胸前和肩前侧拉伸。不耸肩。一侧做完换。',steps:[{label:'左',sec:30},{label:'右',sec:30}]},
-{id:'p3',cat:4,name:'吃够了吗？',time:'—',detail:'你44kg，每天蛋白质目标66克（44×1.5）。三餐每餐约22克。训练日训练后2小时内加一勺蛋白粉（20-25克）。\n\n每份约20-25克蛋白质＝一个手掌大的鸡胸肉/牛肉/鱼（约100克）＝2个鸡蛋+1杯牛奶＝一碗豆腐（约200克）＝一勺蛋白粉。\n\n每顿饭：一手掌大的肉/鱼 + 一拳头大的主食 + 一大把蔬菜。训练日多吃半碗饭。\n\n你BMI偏低，每天至少1400-1600大卡，三顿正餐都吃饱不要少吃。',steps:[]},
+// ═══ AUDIO ═══
+let _a=null;
+function A(){if(!_a||_a.state==='closed')_a=new(window.AudioContext||window.webkitAudioContext)();if(_a.state==='suspended')_a.resume();return _a}
+function beepOn(){try{const c=A(),t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=660;o.type='sine';g.gain.setValueAtTime(.25,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.start(t);o.stop(t+.3)}catch(e){}}
+function beepOff(){try{const c=A(),t=c.currentTime;[[0,700],[.22,880],[.44,1100]].forEach(([d,f])=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.4,t+d);g.gain.exponentialRampToValueAtTime(.001,t+d+.2);o.start(t+d);o.stop(t+d+.2)});if(navigator.vibrate)navigator.vibrate([200,100,200,100,200])}catch(e){}}
+
+// ═══ DATA ═══
+const I=[
+{id:'r1',c:0,n:'脚底筋膜球松解',t:'3min',d:'筋膜球放脚底，从脚后跟慢慢滚到脚趾。遇痛点停20-30秒等疼痛减轻。压力5-7分。',s:[{l:'左脚',sec:90},{l:'右脚',sec:90}]},
+{id:'r2',c:0,n:'大腿后侧松解+拉伸',t:'4min',d:'松解：云望放大腿后侧单腿做，从膝盖上方滚到臀部下方，遇痛点停20-30秒。<br>拉伸：坐地上一条腿伸直，身体前俯够脚尖保持30秒。',s:[{l:'左松解',sec:90},{l:'左拉伸',sec:30},{l:'右松解',sec:90},{l:'右拉伸',sec:30}]},
+{id:'r3',c:0,n:'小腿后侧松解+拉伸',t:'4min',d:'松解：云望放小腿后侧单腿做，从脚踝上方滚到膝盖下方。<br>拉伸：面墙弓步后腿伸直脚跟踩地30秒。',s:[{l:'左松解',sec:90},{l:'左拉伸',sec:30},{l:'右松解',sec:90},{l:'右拉伸',sec:30}]},
+{id:'r4',c:0,n:'臀部深层松解+拉伸',t:'5min',d:'松解：筋膜球放臀部中间偏外（梨状肌+臀中肌），坐上去翘二郎腿增压。也压臀侧面凹陷处。找痛点停住。<br>拉伸：仰卧翘二郎腿抱下方腿往胸口拉30秒。',s:[{l:'左松解',sec:120},{l:'左拉伸',sec:30},{l:'右松解',sec:120},{l:'右拉伸',sec:30}]},
+{id:'r5',c:0,n:'大腿前侧松解+拉伸',t:'4min',d:'松解：趴着云望放大腿前侧单腿做，从膝盖上方滚到大腿根。<br>拉伸：站着勾腿手拉脚背往臀部，膝盖朝下保持30秒。',s:[{l:'左松解',sec:90},{l:'左拉伸',sec:30},{l:'右松解',sec:90},{l:'右拉伸',sec:30}]},
+{id:'r6',c:0,n:'髂腰肌松解+拉伸',t:'4min',d:'松解：趴着筋膜球放肚脐斜下方2-3指宽处，轻压不动，遇麻马上挪。<br>拉伸：跪姿弓步身体直立往前推髋30秒。',s:[{l:'左松解',sec:90},{l:'左拉伸',sec:30},{l:'右松解',sec:90},{l:'右拉伸',sec:30}]},
+{id:'r7',c:0,n:'大腿外侧松解+拉伸',t:'4min',d:'松解：侧躺云望放大腿外侧必须单腿。含阔筋膜张肌+髂胫束。上面的腿踩地可减压。<br>拉伸：交叉腿站立身体侧弯30秒。',s:[{l:'左松解',sec:90},{l:'左拉伸',sec:30},{l:'右松解',sec:90},{l:'右拉伸',sec:30}]},
+{id:'r8',c:0,n:'竖脊肌松解+拉伸',t:'4min',d:'松解：仰卧花生球放脊柱两侧不压骨头。右侧更紧多做1分钟。<br>拉伸：坐着侧弯手过头往对侧伸30秒。',s:[{l:'松解',sec:120},{l:'右侧额外',sec:60},{l:'左拉伸',sec:30},{l:'右拉伸',sec:30}]},
+{id:'r9',c:0,n:'腰方肌松解+拉伸',t:'4min',d:'松解：侧躺筋膜球放肋骨下缘与骨盆上缘之间（后腰深处），轻柔压。<br>拉伸：站着同侧手叉腰，对侧手过头侧弯30秒。',s:[{l:'左松解',sec:90},{l:'左拉伸',sec:30},{l:'右松解',sec:90},{l:'右拉伸',sec:30}]},
+{id:'r10',c:0,n:'小腿前侧松解+拉伸',t:'3min',d:'松解：筋膜球手按小腿前外侧（胫骨外侧肌肉不按骨头）。<br>拉伸：跪坐脚背贴地往后坐30秒。',s:[{l:'左松解',sec:60},{l:'左拉伸',sec:30},{l:'右松解',sec:60},{l:'右拉伸',sec:30}]},
+{id:'r11',c:0,n:'大腿内侧松解+拉伸',t:'3:30',d:'松解：趴着一条腿弯曲外展（青蛙腿），云望放内侧单腿做。<br>拉伸：蝴蝶坐身体前倾30秒。',s:[{l:'左松解',sec:90},{l:'右松解',sec:90},{l:'蝴蝶坐',sec:30}]},
+{id:'f1',c:1,n:'足弓训练器 3组×15-20个',t:'3min',d:'一只脚放训练器上，足弓发力踩（不是脚趾抓）。调到15个就酸的阻力。一只脚3组完换。',s:[{l:'左1组',sec:30},{l:'左2组',sec:30},{l:'左3组',sec:30},{l:'右1组',sec:30},{l:'右2组',sec:30},{l:'右3组',sec:30}]},
+{id:'f2',c:1,n:'短足训练 每脚10次',t:'2min',d:'赤脚坐着脚放平。脚趾不动，大脚趾根部往脚跟拉足弓拱起。看着脚确认脚趾没蜷。保持5秒做10次换脚。',s:[{l:'左脚',sec:60},{l:'右脚',sec:60}]},
+{id:'f3',c:1,n:'大脚趾独立下压 每脚10次',t:'2min',d:'赤脚坐着。大脚趾压地小脚趾抬→反过来→交替。分不开没关系每天练。一只脚完换。',s:[{l:'左脚',sec:60},{l:'右脚',sec:60}]},
+{id:'c1',c:2,n:'超人式 3组×10-12个',t:'5:30',d:'趴地双手过头双腿伸直。同时轻抬上半身和双腿离地几厘米就够。保持2-3秒放下。下巴微收臀先收紧。',s:[{l:'第1组',sec:90},{l:'休息',sec:30,r:1},{l:'第2组',sec:90},{l:'休息',sec:30,r:1},{l:'第3组',sec:90}]},
+{id:'c2',c:2,n:'死虫 3组×8个/侧',t:'5:30',d:'躺着腰贴地。双手指天花板双腿抬起弯90°。呼气对侧手脚伸出去，腰贴地不拱——要拱就缩小幅度。慢做。',s:[{l:'第1组',sec:90},{l:'休息',sec:30,r:1},{l:'第2组',sec:90},{l:'休息',sec:30,r:1},{l:'第3组',sec:90}]},
+{id:'c3',c:2,n:'侧平板 每侧2组×30秒',t:'2:45',d:'侧躺前臂撑地肘在肩下方。胯顶起成一条直线。弱的那侧可多做。',s:[{l:'左1组',sec:30},{l:'休息',sec:15,r:1},{l:'左2组',sec:30},{l:'休息',sec:15,r:1},{l:'右1组',sec:30},{l:'休息',sec:15,r:1},{l:'右2组',sec:30}]},
 ];
-const CATS=[{name:'松解拉伸',color:'#C4836A',ids:['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11']},{name:'足部训练',color:'#5BA05B',ids:['f1','f2','f3']},{name:'空手屈髋 + 中立位',color:'#5B8EC4',ids:['h1','h2','h3']},{name:'核心训练',color:'#E8C84A',ids:['c1','c2','c3']},{name:'体态纠正',color:'#B08AD4',ids:['p1','p2','p3']}];
-const TOTAL_ITEMS=ITEMS.length,ITEM_IDS=ITEMS.map(i=>i.id);
-let totalTimerInterval=null,totalTimerSeconds=0,totalTimerRunning=false;
-function toggleTotalTimer(){const btn=document.getElementById('totalTimerBtn');if(totalTimerRunning){totalTimerRunning=false;clearInterval(totalTimerInterval);btn.textContent='继续';btn.classList.remove('active')}else{totalTimerRunning=true;totalTimerInterval=setInterval(()=>{totalTimerSeconds++;document.getElementById('totalTime').textContent=formatTime(totalTimerSeconds)},1000);btn.textContent='暂停';btn.classList.add('active')}}
-let activeTimer=null;
-function formatTime(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
-function startStep(itemId,stepIdx){
-  const item=ITEMS.find(i=>i.id===itemId);if(!item||stepIdx>=item.steps.length)return;
-  for(let i=0;i<stepIdx;i++){const pb=document.querySelector(`[data-item="${itemId}"][data-step="${i}"]`);if(pb&&!pb.classList.contains('completed'))return}
-  const step=item.steps[stepIdx],btn=document.querySelector(`[data-item="${itemId}"][data-step="${stepIdx}"]`);
-  if(!btn||btn.classList.contains('completed'))return;
-  if(activeTimer){if(activeTimer.itemId===itemId&&activeTimer.stepIdx===stepIdx){if(activeTimer.paused){activeTimer.paused=false;btn.classList.add(step.rest?'rest-running':'running');activeTimer.interval=setInterval(()=>tickStep(),1000)}else{activeTimer.paused=true;clearInterval(activeTimer.interval);btn.classList.remove('running','rest-running')}return}stopActiveTimer()}
-  if(!totalTimerRunning)toggleTotalTimer();
-  playStart();
-  activeTimer={itemId,stepIdx,btn,remaining:step.sec,total:step.sec,name:item.name+' · '+step.label,paused:false,isRest:!!step.rest,interval:setInterval(()=>tickStep(),1000)};
-  btn.classList.add(step.rest?'rest-running':'running');btn.querySelector('.s-time').textContent=formatTime(step.sec);updateFloating()
+const G=[
+  {n:'松解拉伸',co:'var(--clay)',icon:'🧘',bg:'var(--amber-bg)',tx:'var(--clay3)',ids:['r1','r2','r3','r4','r5','r6','r7','r8','r9','r10','r11'],drag:true},
+  {n:'足部训练',co:'var(--sage)',icon:'🦶',bg:'var(--sage-bg)',tx:'var(--sage2)',ids:['f1','f2','f3'],drag:false},
+  {n:'核心训练',co:'var(--amber)',icon:'💪',bg:'var(--amber-bg)',tx:'var(--clay3)',ids:['c1','c2','c3'],drag:false},
+];
+const TOT=I.length,IDS=I.map(x=>x.id);
+let itemOrd={};
+function getOrd(ci){return itemOrd['c'+ci]||G[ci].ids.slice()}
+function saveOrd(ci,o){itemOrd['c'+ci]=o;localStorage.setItem('itemOrd',JSON.stringify(itemOrd))}
+function loadOrd(){try{itemOrd=JSON.parse(localStorage.getItem('itemOrd')||'{}')}catch(e){itemOrd={}}}
+
+// ═══ TOTAL TIMER ═══
+let ttI=null,ttS=0,ttOn=false;
+function toggleTT(){const b=document.getElementById('ttBtn');if(ttOn){ttOn=false;clearInterval(ttI);b.textContent='继续';b.className='td-btn go'}else{ttOn=true;ttI=setInterval(()=>{ttS++;document.getElementById('ttTime').textContent=fmt(ttS)},1000);b.textContent='暂停';b.className='td-btn stop'}}
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+
+// ═══ STEP TIMER ═══
+let tm=null;
+function startS(iId,si){
+  const it=I.find(x=>x.id===iId);if(!it||si>=it.s.length)return;
+  const step=it.s[si],btn=document.querySelector(`[data-i="${iId}"][data-s="${si}"]`);
+  if(!btn||btn.classList.contains('ok'))return;
+  if(tm&&tm.iId===iId&&tm.si===si){
+    if(tm.p){tm.p=false;btn.classList.remove('wait');btn.classList.add(step.r?'rest-on':'on');tm.iv=setInterval(tick,1000)}
+    else{tm.p=true;clearInterval(tm.iv);btn.classList.remove('on','rest-on');btn.classList.add('wait')}return}
+  if(tm)stopT();
+  if(!ttOn)toggleTT();
+  beepOn();
+  tm={iId,si,btn,rem:step.sec,tot:step.sec,n:it.n,l:step.l,p:false,iv:setInterval(tick,1000)};
+  btn.classList.add(step.r?'rest-on':'on');btn.querySelector('.st').textContent=fmt(step.sec);updF()
 }
-function tickStep(){if(!activeTimer)return;activeTimer.remaining--;activeTimer.btn.querySelector('.s-time').textContent=formatTime(activeTimer.remaining);updateFloating();
-  if(activeTimer.remaining<=0){clearInterval(activeTimer.interval);playEnd();activeTimer.btn.classList.remove('running','rest-running');activeTimer.btn.classList.add('completed');activeTimer.btn.querySelector('.s-icon').textContent='✓';activeTimer.btn.querySelector('.s-time').textContent='完成';
-    const iId=activeTimer.itemId,sIdx=activeTimer.stepIdx,item=ITEMS.find(i=>i.id===iId);activeTimer=null;hideFloating();
-    const allDone=item.steps.every((_,i)=>{const b=document.querySelector(`[data-item="${iId}"][data-step="${i}"]`);return b&&b.classList.contains('completed')});
-    if(allDone){const row=document.querySelector(`.check-row[data-id="${iId}"]`);if(row&&!row.classList.contains('done')){row.classList.add('done');saveTodayItem(iId,true);updateProgress()}}
-    if(sIdx+1<item.steps.length)setTimeout(()=>startStep(iId,sIdx+1),500)}}
-function stopActiveTimer(){if(!activeTimer)return;clearInterval(activeTimer.interval);const item=ITEMS.find(i=>i.id===activeTimer.itemId),step=item.steps[activeTimer.stepIdx];activeTimer.btn.classList.remove('running','rest-running');activeTimer.btn.querySelector('.s-icon').textContent='⏱';activeTimer.btn.querySelector('.s-time').textContent=formatTime(activeTimer.total);activeTimer=null;hideFloating()}
-function updateFloating(){if(!activeTimer)return;document.getElementById('ftName').textContent=activeTimer.name;document.getElementById('ftTime').textContent=formatTime(activeTimer.remaining);const r=activeTimer.btn.getBoundingClientRect();document.getElementById('floatingTimer').classList.toggle('show',!(r.top>-20&&r.bottom<window.innerHeight+20))}
-function hideFloating(){document.getElementById('floatingTimer').classList.remove('show')}
-window.addEventListener('scroll',()=>{if(activeTimer)updateFloating()},{passive:true});
-document.getElementById('floatingTimer').addEventListener('click',e=>{if(e.target.classList.contains('ft-stop'))return;if(activeTimer)activeTimer.btn.scrollIntoView({behavior:'smooth',block:'center'})});
-function renderItems(){const c=document.getElementById('itemsContainer');let h='';
-  CATS.forEach((cat,ci)=>{h+=`<div class="category"><div class="cat-header"><div class="cat-left"><div class="cat-dot" style="background:${cat.color}"></div><div class="cat-name">${cat.name}</div></div><div class="cat-progress" id="cat${ci}Progress">0/${cat.ids.length}</div></div><div class="cat-items">`;
-    cat.ids.forEach(id=>{const item=ITEMS.find(i=>i.id===id);const dt=item.detail.replace(/\n/g,'<br>');
-      h+=`<div class="check-row" data-id="${id}"><div class="check-top"><div class="checkbox" onclick="event.stopPropagation();toggleItem(this.closest('.check-row'))"></div><div class="check-info" onclick="event.stopPropagation();toggleItem(this.closest('.check-row'))"><div class="check-title">${item.name}</div></div><div class="check-right"><div class="check-time">${item.time}</div><div class="toggle-detail" onclick="event.stopPropagation();toggleDetail('${id}')">展开 ▾</div></div></div><div class="check-detail" id="detail-${id}">${dt}</div>`;
-      if(item.steps.length>0){h+=`<div class="timer-steps">`;item.steps.forEach((s,si)=>{h+=`<button class="step-btn" data-item="${id}" data-step="${si}" onclick="event.stopPropagation();startStep('${id}',${si})"><span class="s-icon">⏱</span><span class="s-time">${formatTime(s.sec)}</span><span class="s-label">${s.label}</span></button>`});h+=`</div>`}
-      h+=`</div>`});h+=`</div></div>`});c.innerHTML=h}
-function toggleDetail(id){const el=document.getElementById('detail-'+id);el.classList.toggle('show');const row=el.closest('.check-row'),t=row.querySelector('.toggle-detail');if(t)t.textContent=el.classList.contains('show')?'收起 ▴':'展开 ▾'}
-function getDateKey(d){const dd=d||new Date();return dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0')}
-function loadData(){try{return JSON.parse(localStorage.getItem('dailyCheck')||'{}')}catch(e){return{}}}
-function saveData(d){localStorage.setItem('dailyCheck',JSON.stringify(d))}
-function getTodayData(){return loadData()[getDateKey()]||{}}
-function saveTodayItem(id,v){const d=loadData(),k=getDateKey();if(!d[k])d[k]={};d[k][id]=v;saveData(d)}
-function initToday(){const t=new Date();document.getElementById('dateDisplay').textContent=t.getFullYear()+'年'+(t.getMonth()+1)+'月'+t.getDate()+'日';const td=getTodayData();document.querySelectorAll('.check-row').forEach(r=>{if(td[r.dataset.id])r.classList.add('done');else r.classList.remove('done')});updateProgress()}
-function toggleItem(row){const id=row.dataset.id;const isDone=row.classList.toggle('done');saveTodayItem(id,isDone);updateProgress()}
-function updateProgress(){const td=getTodayData();let done=0;ITEM_IDS.forEach(id=>{if(td[id])done++});const pct=Math.round(done/TOTAL_ITEMS*100);document.getElementById('ringPct').textContent=pct+'%';document.getElementById('doneCount').textContent='已完成 '+done+'/'+TOTAL_ITEMS+' 项';const circ=2*Math.PI*30;document.getElementById('ringFill').style.strokeDashoffset=circ-(circ*pct/100);CATS.forEach((cat,ci)=>{let cd=0;cat.ids.forEach(id=>{if(td[id])cd++});const el=document.getElementById('cat'+ci+'Progress');if(el)el.textContent=cd+'/'+cat.ids.length});document.getElementById('streakDisplay').textContent='🔥 连续打卡 '+calcStreak()+' 天'}
-function calcStreak(){const data=loadData();let streak=0;const today=new Date(),todayKey=getDateKey(today),todayData=data[todayKey]||{};let todayDone=0;ITEM_IDS.forEach(id=>{if(todayData[id])todayDone++});const half=Math.floor(TOTAL_ITEMS*.5);if(todayDone>=half)streak=1;else{const yd=new Date(today);yd.setDate(yd.getDate()-1);const ydData=data[getDateKey(yd)]||{};let yDone=0;ITEM_IDS.forEach(id=>{if(ydData[id])yDone++});if(yDone<half)return 0}let d=new Date(today);if(todayDone<half)d.setDate(d.getDate()-1);while(true){const k=getDateKey(d),dd=data[k]||{};let cnt=0;ITEM_IDS.forEach(id=>{if(dd[id])cnt++});if(cnt>=half){if(d.getTime()!==today.getTime()||todayDone>=half)streak++;d.setDate(d.getDate()-1)}else break;if(streak>365)break}return streak}
-function resetToday(){const d=loadData();d[getDateKey()]={};saveData(d);stopActiveTimer();totalTimerRunning=false;clearInterval(totalTimerInterval);totalTimerSeconds=0;document.getElementById('totalTime').textContent='0:00';document.getElementById('totalTimerBtn').textContent='开始';document.getElementById('totalTimerBtn').classList.remove('active');document.querySelectorAll('.step-btn').forEach(b=>{b.classList.remove('completed','running','rest-running');b.querySelector('.s-icon').textContent='⏱';const item=ITEMS.find(i=>i.id===b.dataset.item);if(item){const s=item.steps[parseInt(b.dataset.step)];if(s)b.querySelector('.s-time').textContent=formatTime(s.sec)}});initToday()}
-function clearAll(){localStorage.removeItem('dailyCheck');resetToday();if(document.getElementById('calendarView').style.display!=='none')renderCalendar()}
-function showView(v){document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));if(v==='today'){document.getElementById('todayView').style.display='block';document.getElementById('calendarView').style.display='none';document.querySelectorAll('.view-btn')[0].classList.add('active')}else{document.getElementById('todayView').style.display='none';document.getElementById('calendarView').style.display='block';document.querySelectorAll('.view-btn')[1].classList.add('active');renderCalendar()}}
-let calMonth=new Date().getMonth(),calYear=new Date().getFullYear();
-function changeMonth(delta){calMonth+=delta;if(calMonth>11){calMonth=0;calYear++}if(calMonth<0){calMonth=11;calYear--}renderCalendar()}
-function renderCalendar(){const data=loadData(),today=new Date(),todayKey=getDateKey(today);document.getElementById('monthTitle').textContent=calYear+'年'+(calMonth+1)+'月';const firstDay=new Date(calYear,calMonth,1).getDay(),daysInMonth=new Date(calYear,calMonth+1,0).getDate();let html='';['日','一','二','三','四','五','六'].forEach(d=>{html+='<div class="cal-weekday">'+d+'</div>'});for(let i=0;i<firstDay;i++)html+='<div class="cal-day empty"></div>';let totalDays=0,totalPct=0;for(let d=1;d<=daysInMonth;d++){const date=new Date(calYear,calMonth,d),key=getDateKey(date),dayData=data[key]||{};let done=0;ITEM_IDS.forEach(id=>{if(dayData[id])done++});const pct=Math.round(done/TOTAL_ITEMS*100);const isToday=key===todayKey,isFuture=date>today;let cls='cal-day';if(isToday)cls+=' today';if(isFuture)cls+=' future';else if(done>0){totalDays++;totalPct+=pct;if(pct>=80)cls+=' complete';else if(pct>0)cls+=' partial'}else if(!isToday&&date<today&&Math.floor((today-date)/86400000)<=30)cls+=' missed';html+='<div class="'+cls+'" onclick="showDayDetail(\''+key+'\','+d+')"><div class="day-num">'+d+'</div>';if(!isFuture&&done>0)html+='<div class="day-pct">'+pct+'%</div>';html+='</div>'}document.getElementById('calGrid').innerHTML=html;document.getElementById('statTotal').textContent=totalDays;document.getElementById('statStreak').textContent=calcStreak();document.getElementById('statAvg').textContent=totalDays>0?Math.round(totalPct/totalDays)+'%':'0%'}
-function showDayDetail(key,dayNum){const data=loadData(),dayData=data[key]||{};let done=0;ITEM_IDS.forEach(id=>{if(dayData[id])done++});if(!done){document.getElementById('dayDetail').style.display='none';return}document.getElementById('dayDetail').style.display='block';document.getElementById('dayDetailTitle').textContent=(calMonth+1)+'月'+dayNum+'日 · 完成 '+done+'/'+TOTAL_ITEMS;let content='';ITEM_IDS.forEach(id=>{const item=ITEMS.find(i=>i.id===id);if(dayData[id])content+='<span style="color:var(--green)">✓</span> '+item.name+'　';else content+='<span style="opacity:.3">✗ '+item.name+'</span>　'});document.getElementById('dayDetailContent').innerHTML=content}
-renderItems();initToday();
+function tick(){if(!tm)return;tm.rem--;tm.btn.querySelector('.st').textContent=fmt(tm.rem);updF();
+  if(tm.rem<=0){clearInterval(tm.iv);beepOff();
+    tm.btn.classList.remove('on','rest-on');tm.btn.classList.add('ok');tm.btn.querySelector('.st').textContent='✓';
+    const iId=tm.iId,it=I.find(x=>x.id===iId);
+    const allOk=it.s.every((_,i)=>{const b=document.querySelector(`[data-i="${iId}"][data-s="${i}"]`);return b&&b.classList.contains('ok')});
+    if(allOk){const row=document.querySelector(`.it[data-id="${iId}"]`);if(row&&!row.classList.contains('done')){row.classList.add('done');saveIt(iId,true);updP()}}
+    tm=null;hideF()}}
+function stopT(){if(!tm)return;clearInterval(tm.iv);tm.btn.classList.remove('on','rest-on','wait');tm.btn.querySelector('.st').textContent=fmt(tm.tot);tm=null;hideF()}
+function updF(){if(!tm)return;document.getElementById('fN').textContent=tm.n;document.getElementById('fL').textContent=tm.l;document.getElementById('fT').textContent=fmt(tm.rem);const r=tm.btn.getBoundingClientRect();document.getElementById('flt').classList.toggle('show',!(r.top>-20&&r.bottom<window.innerHeight+20))}
+function hideF(){document.getElementById('flt').classList.remove('show')}
+function scrollA(){if(tm)tm.btn.scrollIntoView({behavior:'smooth',block:'center'})}
+window.addEventListener('scroll',()=>{if(tm)updF()},{passive:true});
+
+// ═══ RENDER ═══
+function render(){const box=document.getElementById('box');let h='';
+  G.forEach((g,ci)=>{const ord=getOrd(ci);
+    h+=`<div class="sec"><div class="sec-head"><div class="sec-left"><div class="sec-icon" style="background:${g.bg}">${g.icon}</div><div class="sec-name">${g.n}</div></div><div class="sec-cnt" id="gc${ci}" style="background:${g.bg};color:${g.tx}">0/${ord.length}</div></div><div class="sec-body" id="gb${ci}" data-ci="${ci}">`;
+    ord.forEach(id=>{const it=I.find(x=>x.id===id);if(!it)return;
+      h+=`<div class="it" data-id="${id}"><div class="it-top">`;
+      if(g.drag)h+=`<div class="grip" data-dg="${id}"><i></i><i></i><i></i></div>`;
+      h+=`<div class="ck" onclick="event.stopPropagation();togIt(this.closest('.it'))"></div><div class="it-body" onclick="event.stopPropagation();togIt(this.closest('.it'))"><div class="it-name">${it.n}</div></div><div class="it-meta"><div class="it-dur">${it.t}</div><div class="it-tog" onclick="event.stopPropagation();togD('${id}')">详情 ▾</div></div></div>`;
+      h+=`<div class="it-det" id="d-${id}">${it.d}</div>`;
+      if(it.s.length){h+=`<div class="stp-row">`;it.s.forEach((s,si)=>{h+=`<button class="stp" data-i="${id}" data-s="${si}" onclick="event.stopPropagation();startS('${id}',${si})"><span class="st">${fmt(s.sec)}</span><span class="sl">${s.l}</span></button>`});h+=`</div>`}
+      h+=`</div>`});
+    h+=`</div></div>`});
+  box.innerHTML=h;initDrag()}
+function togD(id){const el=document.getElementById('d-'+id);el.classList.toggle('open');const row=el.closest('.it'),t=row.querySelector('.it-tog');if(t)t.textContent=el.classList.contains('open')?'收起 ▴':'详情 ▾'}
+
+// ═══ DRAG ═══
+function initDrag(){document.querySelectorAll('.grip').forEach(h=>{h.addEventListener('touchstart',ds,{passive:false});h.addEventListener('mousedown',ds)})}
+let dI=null,dC=null;
+function ds(e){e.preventDefault();dI=e.currentTarget.closest('.it');dC=parseInt(e.currentTarget.closest('.sec-body').dataset.ci);dI.classList.add('dragging');document.addEventListener('touchmove',dm,{passive:false});document.addEventListener('touchend',de);document.addEventListener('mousemove',dm);document.addEventListener('mouseup',de)}
+function dm(e){e.preventDefault();const t=e.touches?e.touches[0]:e,y=t.clientY,c=document.getElementById('gb'+dC),its=[...c.querySelectorAll('.it:not(.dragging)')];its.forEach(i=>i.classList.remove('drag-over'));for(const i of its){const r=i.getBoundingClientRect();if(y<r.top+r.height/2){i.classList.add('drag-over');break}}}
+function de(){if(!dI)return;const c=document.getElementById('gb'+dC),ov=c.querySelector('.it.drag-over');if(ov&&ov!==dI)c.insertBefore(dI,ov);const o=[...c.querySelectorAll('.it')].map(i=>i.dataset.id);saveOrd(dC,o);document.querySelectorAll('.it').forEach(i=>i.classList.remove('dragging','drag-over'));dI=null;document.removeEventListener('touchmove',dm);document.removeEventListener('touchend',de);document.removeEventListener('mousemove',dm);document.removeEventListener('mouseup',de)}
+
+// ═══ DATA ═══
+function dk(d){const x=d||new Date();return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
+function ld(){try{return JSON.parse(localStorage.getItem('dailyCheck')||'{}')}catch(e){return{}}}
+function sv(d){localStorage.setItem('dailyCheck',JSON.stringify(d))}
+function gt(){return ld()[dk()]||{}}
+function saveIt(id,v){const d=ld(),k=dk();if(!d[k])d[k]={};d[k][id]=v;sv(d)}
+function init(){const t=new Date(),wd=['日','一','二','三','四','五','六'];document.getElementById('hDate').textContent=(t.getMonth()+1)+'月'+t.getDate()+'日 · 周'+wd[t.getDay()];const data=gt();document.querySelectorAll('.it').forEach(r=>{if(data[r.dataset.id])r.classList.add('done');else r.classList.remove('done')});updP()}
+function togIt(row){const id=row.dataset.id;const done=row.classList.toggle('done');saveIt(id,done);updP()}
+function updP(){const data=gt();let done=0;IDS.forEach(id=>{if(data[id])done++});const pct=Math.round(done/TOT*100);document.getElementById('rP').textContent=pct+'%';document.getElementById('pD').innerHTML='已完成 <b>'+done+'</b>/'+TOT+' 项';const circ=2*Math.PI*24;document.getElementById('rF').style.strokeDashoffset=circ-(circ*pct/100);
+  G.forEach((g,ci)=>{const ord=getOrd(ci);let cd=0;ord.forEach(id=>{if(data[id])cd++});const el=document.getElementById('gc'+ci);if(el)el.textContent=cd+'/'+ord.length});
+  document.getElementById('pS').textContent='🔥 连续 '+stk()+' 天'}
+function stk(){const data=ld();let s=0;const today=new Date(),tk=dk(today),td=data[tk]||{};let tc=0;IDS.forEach(id=>{if(td[id])tc++});const h=Math.floor(TOT*.5);if(tc>=h)s=1;else{const yd=new Date(today);yd.setDate(yd.getDate()-1);const ydd=data[dk(yd)]||{};let yc=0;IDS.forEach(id=>{if(ydd[id])yc++});if(yc<h)return 0}let d=new Date(today);if(tc<h)d.setDate(d.getDate()-1);while(true){const k=dk(d),dd=data[k]||{};let c=0;IDS.forEach(id=>{if(dd[id])c++});if(c>=h){if(d.getTime()!==today.getTime()||tc>=h)s++;d.setDate(d.getDate()-1)}else break;if(s>365)break}return s}
+function resetDay(){const d=ld();d[dk()]={};sv(d);stopT();ttOn=false;clearInterval(ttI);ttS=0;document.getElementById('ttTime').textContent='0:00';document.getElementById('ttBtn').textContent='开始';document.getElementById('ttBtn').className='td-btn go';document.querySelectorAll('.stp').forEach(b=>{b.classList.remove('ok','on','rest-on','wait');const it=I.find(x=>x.id===b.dataset.i);if(it){const s=it.s[parseInt(b.dataset.s)];if(s)b.querySelector('.st').textContent=fmt(s.sec)}});init()}
+function clearAll(){localStorage.removeItem('dailyCheck');localStorage.removeItem('itemOrd');loadOrd();render();resetDay();if(document.getElementById('vC').style.display!=='none')renderC()}
+function showV(v){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));if(v==='today'){document.getElementById('vT').style.display='block';document.getElementById('vC').style.display='none';document.querySelectorAll('.tab')[0].classList.add('on')}else{document.getElementById('vT').style.display='none';document.getElementById('vC').style.display='block';document.querySelectorAll('.tab')[1].classList.add('on');renderC()}}
+let cM=new Date().getMonth(),cY=new Date().getFullYear();
+function chgM(d){cM+=d;if(cM>11){cM=0;cY++}if(cM<0){cM=11;cY--}renderC()}
+function renderC(){const data=ld(),today=new Date(),tk=dk(today);document.getElementById('mT').textContent=cY+'年'+(cM+1)+'月';const fd=new Date(cY,cM,1).getDay(),dim=new Date(cY,cM+1,0).getDate();let h='';['日','一','二','三','四','五','六'].forEach(d=>{h+='<div class="cw">'+d+'</div>'});for(let i=0;i<fd;i++)h+='<div class="cd e"></div>';let tD=0,tP=0;for(let d=1;d<=dim;d++){const date=new Date(cY,cM,d),key=dk(date),dd=data[key]||{};let done=0;IDS.forEach(id=>{if(dd[id])done++});const pct=Math.round(done/TOT*100);const isT=key===tk,isF=date>today;let cls='cd';if(isT)cls+=' td';if(isF)cls+=' fu';else if(done>0){tD++;tP+=pct;cls+=pct>=80?' fl':' pt'}else if(!isT&&date<today&&Math.floor((today-date)/864e5)<=30)cls+=' ms';h+='<div class="'+cls+'" onclick="showDD(\''+key+'\','+d+')"><div>'+d+'</div>';if(!isF&&done>0)h+='<div class="dp">'+pct+'%</div>';h+='</div>'}document.getElementById('cG').innerHTML=h;document.getElementById('sT').textContent=tD;document.getElementById('sS').textContent=stk();document.getElementById('sA').textContent=tD>0?Math.round(tP/tD)+'%':'0%'}
+function showDD(key,dn){const data=ld(),dd=data[key]||{};let done=0;IDS.forEach(id=>{if(dd[id])done++});if(!done){document.getElementById('dD').style.display='none';return}document.getElementById('dD').style.display='block';document.getElementById('dT').textContent=(cM+1)+'月'+dn+'日 · '+done+'/'+TOT;let c='';IDS.forEach(id=>{const it=I.find(x=>x.id===id);c+=dd[id]?'<span style="color:var(--sage)">✓</span> '+it.n+'　':'<span style="opacity:.3">✗ '+it.n+'</span>　'});document.getElementById('dC').innerHTML=c}
+
+// INIT
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+loadOrd();render();init();
 </script>
 </body>
 </html>
