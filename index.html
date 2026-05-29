@@ -148,6 +148,14 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
 .cd .dp{font-size:8px;font-weight:700;margin-top:1px}
 .cd.fl .dp{color:rgba(255,255,255,.75)}
 
+/* ── Gap Setting ── */
+.gap-bar{background:var(--cream);border:1px solid var(--mist);border-radius:var(--r);padding:12px 16px;margin-top:14px;box-shadow:0 2px 8px rgba(60,50,41,.03)}
+.gap-label{font-size:12px;color:var(--stone);font-weight:500;margin-bottom:8px}
+.gap-opts{display:flex;gap:6px;flex-wrap:wrap}
+.gap-opt{font-family:'Outfit',sans-serif;padding:6px 14px;border-radius:20px;border:1.5px solid var(--mist);background:var(--cream);font-size:12px;font-weight:600;color:var(--stone);cursor:pointer}
+.gap-opt.sel{border-color:var(--clay);color:var(--clay3);background:var(--amber-bg)}
+.gap-countdown{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:20px;background:var(--amber-bg);border:1.5px solid var(--clay);color:var(--clay3);font-size:12px;font-weight:700;animation:blink .8s ease-in-out infinite}
+
 .rst-bar{display:flex;gap:8px;padding:16px 0}
 .rst{flex:1;padding:12px;border:1px solid var(--mist);border-radius:12px;background:var(--cream);color:var(--stone);font-size:13px;cursor:pointer;text-align:center;font-weight:500;font-family:inherit}
 .rst:active{background:var(--silk)}
@@ -174,6 +182,10 @@ body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xm
   <div class="tabs"><button class="tab on" onclick="showV('today')">今日任务</button><button class="tab" onclick="showV('cal')">打卡记录</button></div>
 
   <div id="vT">
+    <div class="gap-bar">
+      <div class="gap-label">步骤间隔 · 每步做完后自动倒数再跳下一步</div>
+      <div class="gap-opts" id="gapOpts"></div>
+    </div>
     <div id="box"></div>
     <div style="text-align:center;padding:14px 0;color:var(--stone);font-size:12px">约55分钟 · 长按拖动可调顺序</div>
     <div class="rst-bar"><button class="rst" onclick="resetDay()">重置今日</button><button class="rst" onclick="if(confirm('清除所有记录？'))clearAll()">清除所有</button></div>
@@ -236,9 +248,16 @@ let ttI=null,ttS=0,ttOn=false;
 function toggleTT(){const b=document.getElementById('ttBtn');if(ttOn){ttOn=false;clearInterval(ttI);b.textContent='继续';b.className='td-btn go'}else{ttOn=true;ttI=setInterval(()=>{ttS++;document.getElementById('ttTime').textContent=fmt(ttS)},1000);b.textContent='暂停';b.className='td-btn stop'}}
 function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 
+// ═══ STEP GAP (auto-advance interval) ═══
+const GAP_OPTIONS=[{l:'关闭',v:0},{l:'3秒',v:3},{l:'5秒',v:5},{l:'8秒',v:8},{l:'10秒',v:10},{l:'15秒',v:15}];
+let stepGap=parseInt(localStorage.getItem('stepGap')||'5');
+function renderGap(){const box=document.getElementById('gapOpts');box.innerHTML='';GAP_OPTIONS.forEach(o=>{const b=document.createElement('button');b.className='gap-opt'+(o.v===stepGap?' sel':'');b.textContent=o.l;b.onclick=()=>{stepGap=o.v;localStorage.setItem('stepGap',stepGap);renderGap()};box.appendChild(b)})}
+
 // ═══ STEP TIMER ═══
-let tm=null;
+let tm=null,gapTimer=null;
 function startS(iId,si){
+  // Cancel any gap countdown
+  if(gapTimer){clearInterval(gapTimer.iv);const gb=gapTimer.btn;if(gb){gb.classList.remove('gap-countdown-on');gb.querySelector('.st').textContent=fmt(gapTimer.nextSec)}gapTimer=null}
   const it=I.find(x=>x.id===iId);if(!it||si>=it.s.length)return;
   const step=it.s[si],btn=document.querySelector(`[data-i="${iId}"][data-s="${si}"]`);
   if(!btn||btn.classList.contains('ok'))return;
@@ -254,11 +273,29 @@ function startS(iId,si){
 function tick(){if(!tm)return;tm.rem--;tm.btn.querySelector('.st').textContent=fmt(tm.rem);updF();
   if(tm.rem<=0){clearInterval(tm.iv);beepOff();
     tm.btn.classList.remove('on','rest-on');tm.btn.classList.add('ok');tm.btn.querySelector('.st').textContent='✓';
-    const iId=tm.iId,it=I.find(x=>x.id===iId);
+    const iId=tm.iId,sIdx=tm.si,it=I.find(x=>x.id===iId);
     const allOk=it.s.every((_,i)=>{const b=document.querySelector(`[data-i="${iId}"][data-s="${i}"]`);return b&&b.classList.contains('ok')});
     if(allOk){const row=document.querySelector(`.it[data-id="${iId}"]`);if(row&&!row.classList.contains('done')){row.classList.add('done');saveIt(iId,true);updP()}}
-    tm=null;hideF()}}
-function stopT(){if(!tm)return;clearInterval(tm.iv);tm.btn.classList.remove('on','rest-on','wait');tm.btn.querySelector('.st').textContent=fmt(tm.tot);tm=null;hideF()}
+    tm=null;hideF();
+    // Auto-advance to next step
+    if(sIdx+1<it.s.length && stepGap>0){
+      const nextSi=sIdx+1,nextStep=it.s[nextSi];
+      const nextBtn=document.querySelector(`[data-i="${iId}"][data-s="${nextSi}"]`);
+      if(nextBtn&&!nextBtn.classList.contains('ok')){
+        let gapRem=stepGap;
+        nextBtn.querySelector('.st').textContent=gapRem+'s';
+        nextBtn.classList.add('wait');
+        gapTimer={iv:setInterval(()=>{
+          gapRem--;
+          if(gapRem<=0){clearInterval(gapTimer.iv);nextBtn.classList.remove('wait');gapTimer=null;startS(iId,nextSi)}
+          else{nextBtn.querySelector('.st').textContent=gapRem+'s'}
+        },1000),btn:nextBtn,nextSec:nextStep.sec}
+      }
+    } else if(sIdx+1<it.s.length && stepGap===0){
+      // Gap is 0 = no auto advance, user clicks manually
+    }
+  }}
+function stopT(){if(gapTimer){clearInterval(gapTimer.iv);if(gapTimer.btn){gapTimer.btn.classList.remove('wait');gapTimer.btn.querySelector('.st').textContent=fmt(gapTimer.nextSec)}gapTimer=null}if(!tm)return;clearInterval(tm.iv);tm.btn.classList.remove('on','rest-on','wait');tm.btn.querySelector('.st').textContent=fmt(tm.tot);tm=null;hideF()}
 function updF(){if(!tm)return;document.getElementById('fN').textContent=tm.n;document.getElementById('fL').textContent=tm.l;document.getElementById('fT').textContent=fmt(tm.rem);const r=tm.btn.getBoundingClientRect();document.getElementById('flt').classList.toggle('show',!(r.top>-20&&r.bottom<window.innerHeight+20))}
 function hideF(){document.getElementById('flt').classList.remove('show')}
 function scrollA(){if(tm)tm.btn.scrollIntoView({behavior:'smooth',block:'center'})}
@@ -298,7 +335,7 @@ function updP(){const data=gt();let done=0;IDS.forEach(id=>{if(data[id])done++})
   G.forEach((g,ci)=>{const ord=getOrd(ci);let cd=0;ord.forEach(id=>{if(data[id])cd++});const el=document.getElementById('gc'+ci);if(el)el.textContent=cd+'/'+ord.length});
   document.getElementById('pS').textContent='🔥 连续 '+stk()+' 天'}
 function stk(){const data=ld();let s=0;const today=new Date(),tk=dk(today),td=data[tk]||{};let tc=0;IDS.forEach(id=>{if(td[id])tc++});const h=Math.floor(TOT*.5);if(tc>=h)s=1;else{const yd=new Date(today);yd.setDate(yd.getDate()-1);const ydd=data[dk(yd)]||{};let yc=0;IDS.forEach(id=>{if(ydd[id])yc++});if(yc<h)return 0}let d=new Date(today);if(tc<h)d.setDate(d.getDate()-1);while(true){const k=dk(d),dd=data[k]||{};let c=0;IDS.forEach(id=>{if(dd[id])c++});if(c>=h){if(d.getTime()!==today.getTime()||tc>=h)s++;d.setDate(d.getDate()-1)}else break;if(s>365)break}return s}
-function resetDay(){const d=ld();d[dk()]={};sv(d);stopT();ttOn=false;clearInterval(ttI);ttS=0;document.getElementById('ttTime').textContent='0:00';document.getElementById('ttBtn').textContent='开始';document.getElementById('ttBtn').className='td-btn go';document.querySelectorAll('.stp').forEach(b=>{b.classList.remove('ok','on','rest-on','wait');const it=I.find(x=>x.id===b.dataset.i);if(it){const s=it.s[parseInt(b.dataset.s)];if(s)b.querySelector('.st').textContent=fmt(s.sec)}});init()}
+function resetDay(){const d=ld();d[dk()]={};sv(d);stopT();if(gapTimer){clearInterval(gapTimer.iv);gapTimer=null}ttOn=false;clearInterval(ttI);ttS=0;document.getElementById('ttTime').textContent='0:00';document.getElementById('ttBtn').textContent='开始';document.getElementById('ttBtn').className='td-btn go';document.querySelectorAll('.stp').forEach(b=>{b.classList.remove('ok','on','rest-on','wait');const it=I.find(x=>x.id===b.dataset.i);if(it){const s=it.s[parseInt(b.dataset.s)];if(s)b.querySelector('.st').textContent=fmt(s.sec)}});init()}
 function clearAll(){localStorage.removeItem('dailyCheck');localStorage.removeItem('itemOrd');loadOrd();render();resetDay();if(document.getElementById('vC').style.display!=='none')renderC()}
 function showV(v){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));if(v==='today'){document.getElementById('vT').style.display='block';document.getElementById('vC').style.display='none';document.querySelectorAll('.tab')[0].classList.add('on')}else{document.getElementById('vT').style.display='none';document.getElementById('vC').style.display='block';document.querySelectorAll('.tab')[1].classList.add('on');renderC()}}
 let cM=new Date().getMonth(),cY=new Date().getFullYear();
@@ -308,7 +345,7 @@ function showDD(key,dn){const data=ld(),dd=data[key]||{};let done=0;IDS.forEach(
 
 // INIT
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-loadOrd();render();init();
+loadOrd();renderGap();render();init();
 </script>
 </body>
 </html>
